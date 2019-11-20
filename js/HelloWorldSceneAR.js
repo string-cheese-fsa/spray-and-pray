@@ -1,8 +1,8 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { StyleSheet, DeviceEventEmitter } from 'react-native';
-import { ViroARScene, ViroText, ViroConstants } from 'react-viro';
+import { StyleSheet } from 'react-native';
+import { ViroARScene, ViroText, ViroConstants, ViroPolyline } from 'react-viro';
 
 export default class HelloWorldSceneAR extends Component {
   constructor() {
@@ -10,7 +10,9 @@ export default class HelloWorldSceneAR extends Component {
 
     // Set initial state here
     this.state = {
-      text: `init...`,
+      x: 0,
+      y: 0,
+      coords: [[0, 0, 0]],
     };
     this.myRef = React.createRef();
     // bind 'this' to functions
@@ -20,28 +22,26 @@ export default class HelloWorldSceneAR extends Component {
   componentDidMount() {
     setInterval(() => {
       this.myRef.current.getCameraOrientationAsync().then(orientation => {
-        this.setState({
-          text: `x: ${orientation.position[0].toFixed(
-            3
-          )} y: ${orientation.position[1].toFixed(
-            3
-          )} z: ${orientation.position[2].toFixed(3)}`,
-        });
+        this.setState(prevState => ({
+          x: orientation[0].toFixed(2),
+          y: orientation[1].toFixed(2),
+          coords: [...prevState.coords, [prevState.x, prevState.y, -3]],
+        }));
       });
     }, 100); // 100 ms
   }
 
   _onTrackingUpdated(state, reason) {
-    if (state == ViroConstants.TRACKING_NORMAL) {
+    if (state === ViroConstants.TRACKING_NORMAL) {
       // Show my AR Scene experience
       this.setState({
-        text: `Tracking initialized`,
+        coords: [[0, 0, -2]],
       });
     } else if (state == ViroConstants.TRACKING_NONE) {
       // Prompt user to move phone around
-      this.setState({
-        text: 'Move the phone around!',
-      });
+      // this.setState({
+      //   text: 'Move the phone around!',
+      // });
     }
   }
 
@@ -49,10 +49,16 @@ export default class HelloWorldSceneAR extends Component {
     return (
       <ViroARScene ref={this.myRef} onTrackingUpdated={this._onTrackingUpdated}>
         <ViroText
-          text={this.state.text}
+          text={`x: ${this.state.x} y: ${this.state.y}`}
           scale={[0.5, 0.5, 0.5]}
           position={[0, 0, -1]}
           style={styles.helloWorldTextStyle}
+        />
+        <ViroPolyline
+          position={[0, 0, -2]}
+          points={this.state.coords}
+          thickness={0.2}
+          // materials={['red']}
         />
       </ViroARScene>
     );
