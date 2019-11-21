@@ -1,7 +1,7 @@
 'use strict'
 
 import React, { Component } from 'react'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, PixelRatio, Dimensions, View, Text } from 'react-native'
 import {
   ViroARScene,
   ViroText,
@@ -29,22 +29,26 @@ export default class Main extends Component {
   componentDidMount() {
     setInterval(() => {
       this.myRef.current
-        .getCameraOrientationAsync()
+        .performARHitTestWithPoint((Dimensions.get('window').width * PixelRatio.get()) / 2, (Dimensions.get('window').height * PixelRatio.get()) / 2)
+        //.getCameraOrientationAsync()
         .then(orientation => {
-          this.setState(prevState => ({
-            x: orientation.position[0].toFixed(2) * 10,
-            y: orientation.position[1].toFixed(2) * 10
-          }))
+          let target = orientation.map(obj => obj.transform.position)
+          if (target) {
+            // this.setState({
+            // x: target.transform.position[0].toFixed(2),
+            // y: target.transform.position[1].toFixed(2)
+            // })
+          }
 
-          if (orientation.position.length) {
+          // this.setState(prevState => ({
+          //   x: target.position[0].toFixed(2) * 10,
+          //   y: target.position[1].toFixed(2) * 10
+          // }))
+
+          if (target) {
             this.setState(prevState => ({
               coords: [
-                ...prevState.coords,
-                [
-                  orientation.position[0] * 10,
-                  orientation.position[1] * 10,
-                  orientation.position[2] * 10
-                ]
+                ...prevState.coords, ...target
               ]
             }))
           }
@@ -69,20 +73,20 @@ export default class Main extends Component {
 
   render() {
     return (
-      <ViroARScene ref={this.myRef} onTrackingUpdated={this._onTrackingUpdated}>
-        <ViroText
-          text={`x: ${this.state.x} y: ${this.state.y}`}
-          scale={[0.5, 0.5, 0.5]}
-          position={[0, 0, -1]}
-          style={styles.helloWorldTextStyle}
-        />
-        <ViroPolyline
-          position={[0, 0, -2]}
-          points={this.state.coords}
-          thickness={0.2}
+        <ViroARScene ref={this.myRef} onTrackingUpdated={this._onTrackingUpdated}>
+          <ViroText
+            text={`X: ${this.state.x}  Y:${this.state.y}`}
+            scale={[0.5, 0.5, 0.5]}
+            position={[0, 0, -1]}
+            style={styles.helloWorldTextStyle}
+          />
+          <ViroPolyline
+            position={[0, 0, -2]}
+            points={this.state.coords}
+            thickness={0.2}
           // materials={'red'}
-        />
-      </ViroARScene>
+          />
+        </ViroARScene>
     )
   }
 }
