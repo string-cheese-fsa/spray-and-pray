@@ -1,29 +1,29 @@
-'use strict'
+'use strict';
 
-import React, { Component } from 'react'
-import { StyleSheet } from 'react-native'
+import React, { Component } from 'react';
+import { StyleSheet } from 'react-native';
 import {
   ViroARScene,
   ViroText,
   ViroConstants,
   ViroPolyline,
-  ViroMaterials
-} from 'react-viro'
+  ViroMaterials,
+} from 'react-viro';
 
 export default class Main extends Component {
   constructor() {
-    super()
+    super();
 
     // Set initial state here
     this.state = {
       text: '',
       x: 0,
       y: 0,
-      coords: [[0, 0, -2]]
-    }
-    this.myRef = React.createRef()
+      coords: [[0, 0, -2]],
+    };
+    this.myRef = React.createRef();
     // bind 'this' to functions
-    this._onTrackingUpdated = this._onTrackingUpdated.bind(this)
+    this._onTrackingUpdated = this._onTrackingUpdated.bind(this);
   }
 
   componentDidMount() {
@@ -32,38 +32,38 @@ export default class Main extends Component {
         .getCameraOrientationAsync()
         .then(orientation => {
           this.setState(prevState => ({
-            x: orientation.position[0].toFixed(2) * 10,
-            y: orientation.position[1].toFixed(2) * 10
-          }))
+            x: orientation.forward[0].toFixed(2) * 10,
+            y: orientation.forward[1].toFixed(2) * 10,
+          }));
 
           if (orientation.position.length) {
             this.setState(prevState => ({
               coords: [
                 ...prevState.coords,
                 [
-                  orientation.position[0] * 10,
-                  orientation.position[1] * 10,
-                  orientation.position[2] * 10
-                ]
-              ]
-            }))
+                  orientation.forward[0] * 10,
+                  orientation.forward[1] * 10,
+                  orientation.forward[2] * 10,
+                ],
+              ],
+            }));
           }
         })
-        .catch(error => console.error(error))
-    }, 100) // 100 ms
+        .catch(error => console.error(error));
+    }, 100); // 100 ms
   }
 
   _onTrackingUpdated(state, reason) {
     if (state === ViroConstants.TRACKING_NORMAL) {
       // Show my AR Scene experience
       this.setState({
-        coords: [[0, 0, -2]]
-      })
+        coords: [[0, 0, -2]],
+      });
     } else if (state == ViroConstants.TRACKING_NONE) {
       // Prompt user to move phone around
       this.setState({
-        text: 'Move the phone around!'
-      })
+        text: 'Move the phone around!',
+      });
     }
   }
 
@@ -83,7 +83,7 @@ export default class Main extends Component {
           // materials={'red'}
         />
       </ViroARScene>
-    )
+    );
   }
 }
 
@@ -93,8 +93,8 @@ var styles = StyleSheet.create({
     fontSize: 10,
     color: '#ffffff',
     textAlignVertical: 'center',
-    textAlign: 'center'
-  }
-})
+    textAlign: 'center',
+  },
+});
 
-module.exports = Main
+module.exports = Main;
