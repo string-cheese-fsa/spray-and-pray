@@ -18,6 +18,7 @@ import {
 } from 'react-native'
 
 import { ViroVRSceneNavigator, ViroARSceneNavigator } from 'react-viro'
+import { Dimensions } from 'react-native'
 
 /*
  TODO: Insert your API key below
@@ -99,10 +100,14 @@ export default class ViroSample extends Component {
   // Returns the ViroARSceneNavigator which will start the AR experience
   _getARNavigator() {
     return (
-      <ViroARSceneNavigator
-        {...this.state.sharedProps}
-        initialScene={{ scene: InitialARScene }}
-      />
+      <View style={{flex: 1}}>
+        <ViroARSceneNavigator
+          {...this.state.sharedProps}
+          initialScene={{ scene: InitialARScene }}
+        />
+        <View style={localStyles.crosshair} />
+      </View>
+
     )
   }
 
@@ -187,6 +192,16 @@ var localStyles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#fff'
+  },
+  crosshair: {
+    position: 'absolute',
+    top: (Dimensions.get('window').height / 2),
+    left: (Dimensions.get('window').width / 2),
+    width: 20,
+    height: 20,
+    borderRadius: 15,
+    borderWidth: 1,
+    backgroundColor: 'grey',
   }
 })
 

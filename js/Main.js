@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, PixelRatio, Dimensions, View, Text } from 'react-native';
 import {
   ViroARScene,
   ViroText,
@@ -29,14 +29,18 @@ export default class Main extends Component {
   componentDidMount() {
     setInterval(() => {
       this.myRef.current
-        .getCameraOrientationAsync()
+        .performARHitTestWithPoint(
+          (Dimensions.get('window').width * PixelRatio.get()) / 2,
+          (Dimensions.get('window').height * PixelRatio.get()) / 2
+        )
+        //.getCameraOrientationAsync()
         .then(orientation => {
           this.setState(prevState => ({
             x: orientation.forward[0].toFixed(2) * 10,
             y: orientation.forward[1].toFixed(2) * 10,
           }));
 
-          if (orientation.position.length) {
+          if (target) {
             this.setState(prevState => ({
               coords: [
                 ...prevState.coords,
@@ -71,7 +75,7 @@ export default class Main extends Component {
     return (
       <ViroARScene ref={this.myRef} onTrackingUpdated={this._onTrackingUpdated}>
         <ViroText
-          text={`x: ${this.state.x} y: ${this.state.y}`}
+          text={`X: ${this.state.x}  Y:${this.state.y}`}
           scale={[0.5, 0.5, 0.5]}
           position={[0, 0, -1]}
           style={styles.helloWorldTextStyle}
