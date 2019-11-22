@@ -11,6 +11,7 @@ import {
   ViroSphere,
   ViroNode,
   ViroSpotLight,
+  ViroButton
 } from 'react-viro';
 
 export default class Main extends Component {
@@ -24,7 +25,7 @@ export default class Main extends Component {
       y: 0,
       z: 0,
       material: 'red',
-      camCoords: [],
+      camCoords: [0, 0, 0],
       position: [],
       coords: [],
       lines: [],
@@ -35,6 +36,7 @@ export default class Main extends Component {
     // bind 'this' to functions
     // this._onTrackingUpdated = this._onTrackingUpdated.bind(this);
     this._onClickState = this._onClickState.bind(this);
+    this.clickHandler = this.clickHandler.bind(this)
   }
 
   componentDidMount() {
@@ -46,7 +48,7 @@ export default class Main extends Component {
             x: orientation.forward[0] * 10,
             y: orientation.forward[1] * 10,
             z: orientation.forward[2] * 10,
-            camCoords: orientation.forward,
+            camCoords: orientation.position,
           }));
           if (this.state.painting) {
             if (this.state.coords.length) {
@@ -66,7 +68,9 @@ export default class Main extends Component {
         })
         .catch(error => console.error(error));
     }, 10); // 100 ms
+    // this.setState({material: this.props.material})
   }
+
   _onClickState(stateValue, position, source) {
     switch (stateValue) {
       case 1:
@@ -97,6 +101,10 @@ export default class Main extends Component {
     }
   }
 
+  clickHandler () {
+    this.setState({material: "blue"})
+  }
+
   render() {
     return (
       <ViroARScene
@@ -105,7 +113,7 @@ export default class Main extends Component {
         onClickState={this._onClickState}
       >
         <ViroText
-          text={`position ${this.state.position}`}
+          text={`color ${this.state.material}`}
           scale={[0.5, 0.5, 0.5]}
           position={[0, 0, -1]}
           style={styles.helloWorldTextStyle}
@@ -117,6 +125,11 @@ export default class Main extends Component {
           radius={0.25}
           position={[this.state.x, this.state.y, this.state.z]}
           transformBehaviors={'billboardY'}
+        />
+        <ViroButton
+          position={[this.state.camCoords[0], this.state.camCoords[1], -2]}
+          source = {require("./res/wet_paint.jpg")}
+          onClick={this.clickHandler}
         />
         {this.state.coords.length ? (
           <ViroPolyline

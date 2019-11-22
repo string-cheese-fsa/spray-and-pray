@@ -18,13 +18,13 @@ import {
 } from 'react-native';
 
 import { ViroVRSceneNavigator, ViroARSceneNavigator } from 'react-viro';
-import { Dimensions } from 'react-native';
+import { Dimensions, Button } from 'react-native';
 
 /*
  TODO: Insert your API key below
  */
 var sharedProps = {
-  apiKey: 'API_KEY_HERE',
+  // apiKey: 'API_KEY_HERE',
 };
 
 // Sets the default scene you want for AR and VR
@@ -46,6 +46,7 @@ export default class ViroSample extends Component {
     this.state = {
       navigatorType: defaultNavigatorType,
       sharedProps: sharedProps,
+      // material: "red"
     };
     this._getExperienceSelector = this._getExperienceSelector.bind(this);
     this._getARNavigator = this._getARNavigator.bind(this);
@@ -54,6 +55,7 @@ export default class ViroSample extends Component {
       this
     );
     this._exitViro = this._exitViro.bind(this);
+    // this.clickHandler = this.clickHandler.bind(this)
   }
 
   // Replace this function with the contents of _getVRNavigator() or _getARNavigator()
@@ -97,14 +99,21 @@ export default class ViroSample extends Component {
     );
   }
 
+  // clickHandler(color) {
+  //   this.setState({ material: color })
+  // }
+
   // Returns the ViroARSceneNavigator which will start the AR experience
   _getARNavigator() {
     return (
       <View style={{ flex: 1 }}>
         <ViroARSceneNavigator
-          {...this.state.sharedProps}
+          {...this.state}
           initialScene={{ scene: InitialARScene }}
         />
+        {/* <Button title="blue" onPress={() => {
+          this.clickHandler("blue")
+        }} /> */}
       </View>
     );
   }
