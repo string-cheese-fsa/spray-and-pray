@@ -114,6 +114,7 @@ export default class Main extends Component {
           widthSegmentCount={10}
           radius={0.25}
           position={[this.state.x, this.state.y, this.state.z]}
+          transformBehaviors={'billboardY'}
         />
         {this.state.coords.length ? (
           <ViroPolyline
@@ -121,6 +122,8 @@ export default class Main extends Component {
             thickness={0.4}
             // position={this.state.position}
             // position={[0, 0, -5]}
+            // materials={'rainbow'}
+            // transformBehaviors={'billboardY'}
           />
         ) : (
           <ViroText text={''} />
@@ -133,6 +136,7 @@ export default class Main extends Component {
               // position={line.position}
               // position={this.state.position}
               // position={[0, 0, -5]}
+              // transformBehaviors={'billboardY'}
               thickness={0.4}
             />
           );
@@ -149,6 +153,14 @@ var styles = StyleSheet.create({
     color: '#ffffff',
     textAlignVertical: 'center',
     textAlign: 'center',
+  },
+});
+
+ViroMaterials.createMaterials({
+  rainbow: {
+    shininess: 2.0,
+    lightingModel: 'Lambert',
+    diffuseTexture: require('./res/rainbow_texture.jpg'),
   },
 });
 
