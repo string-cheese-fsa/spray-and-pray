@@ -8,6 +8,9 @@ import {
   ViroConstants,
   ViroPolyline,
   ViroMaterials,
+  ViroSphere,
+  ViroNode,
+  ViroSpotLight,
 } from 'react-viro';
 
 export default class Main extends Component {
@@ -19,73 +22,133 @@ export default class Main extends Component {
       text: '',
       x: 0,
       y: 0,
-      coords: [[0, 0, -2]],
+      z: 0,
+      camCoords: [],
+      position: [],
+      coords: [],
+      lines: [],
+      painting: false,
     };
-    this.myRef = React.createRef();
+    this.cameraRef = React.createRef();
+    this.sphereRef = React.createRef();
     // bind 'this' to functions
-    this._onTrackingUpdated = this._onTrackingUpdated.bind(this);
+    // this._onTrackingUpdated = this._onTrackingUpdated.bind(this);
+    this._onClickState = this._onClickState.bind(this);
   }
 
   componentDidMount() {
     setInterval(() => {
-      this.myRef.current
-        .performARHitTestWithPoint(
-          (Dimensions.get('window').width * PixelRatio.get()) / 2,
-          (Dimensions.get('window').height * PixelRatio.get()) / 2
-        )
-        //.getCameraOrientationAsync()
+      this.cameraRef.current
+        .getCameraOrientationAsync()
         .then(orientation => {
           this.setState(prevState => ({
-            x: orientation.forward[0].toFixed(2) * 10,
-            y: orientation.forward[1].toFixed(2) * 10,
+            x: orientation.forward[0] * 10,
+            y: orientation.forward[1] * 10,
+            z: orientation.forward[2] * 10,
+            camCoords: orientation.forward,
           }));
-
-          if (target) {
-            this.setState(prevState => ({
-              coords: [
-                ...prevState.coords,
-                [
-                  orientation.forward[0] * 10,
-                  orientation.forward[1] * 10,
-                  orientation.forward[2] * 10,
+          if (this.state.painting) {
+            if (this.state.coords.length) {
+              this.setState(prevState => ({
+                coords: [
+                  ...prevState.coords,
+                  [this.state.x, this.state.y, this.state.z],
                 ],
-              ],
-            }));
+              }));
+            } else {
+              this.setState(prevState => ({
+                coords: [[this.state.x, this.state.y, this.state.z]],
+                position: [this.state.x, this.state.y, this.state.z],
+              }));
+            }
           }
         })
         .catch(error => console.error(error));
-    }, 100); // 100 ms
+    }, 10); // 100 ms
   }
 
-  _onTrackingUpdated(state, reason) {
-    if (state === ViroConstants.TRACKING_NORMAL) {
-      // Show my AR Scene experience
-      this.setState({
-        coords: [[0, 0, -2]],
-      });
-    } else if (state == ViroConstants.TRACKING_NONE) {
-      // Prompt user to move phone around
-      this.setState({
-        text: 'Move the phone around!',
-      });
+  // _onTrackingUpdated(state, reason) {
+  //   if (state === ViroConstants.TRACKING_NORMAL) {
+  //     // Show my AR Scene experience
+  //     this.setState({
+  //       coords: [[0, 0, 0]],
+  //     });
+  //   } else if (state == ViroConstants.TRACKING_NONE) {
+  //     // Prompt user to move phone around
+  //     this.setState({
+  //       text: 'Move the phone around!',
+  //     });
+  //   }
+  // }
+
+  _onClickState(stateValue, position, source) {
+    switch (stateValue) {
+      case 1:
+        this.setState({ painting: true });
+        break;
+      case 2:
+        this.setState(prevState => {
+          return {
+            painting: false,
+            lines: [
+              ...prevState.lines,
+              {
+                points: [...prevState.coords],
+                position: [prevState.x, prevState.y, prevState.z],
+              },
+            ],
+            coords: [],
+          };
+        });
+        break;
+      case 3:
+        break;
+      default:
     }
   }
 
   render() {
     return (
-      <ViroARScene ref={this.myRef} onTrackingUpdated={this._onTrackingUpdated}>
+      <ViroARScene
+        ref={this.cameraRef}
+        // onTrackingUpdated={this._onTrackingUpdated}
+        onClickState={this._onClickState}
+      >
         <ViroText
-          text={`X: ${this.state.x}  Y:${this.state.y}`}
+          text={`position ${this.state.position}`}
           scale={[0.5, 0.5, 0.5]}
           position={[0, 0, -1]}
           style={styles.helloWorldTextStyle}
         />
-        <ViroPolyline
-          position={[0, 0, -2]}
-          points={this.state.coords}
-          thickness={0.2}
-          // materials={'red'}
+        <ViroSphere
+          ref={this.sphereRef}
+          heightSegmentCount={10}
+          widthSegmentCount={10}
+          radius={0.25}
+          position={[this.state.x, this.state.y, this.state.z]}
         />
+        {this.state.coords.length ? (
+          <ViroPolyline
+            points={this.state.coords}
+            thickness={0.4}
+            // position={this.state.position}
+            // position={[0, 0, -5]}
+          />
+        ) : (
+          <ViroText text={''} />
+        )}
+        {this.state.lines.map(line => {
+          return (
+            <ViroPolyline
+              key={line.points[0]}
+              points={line.points}
+              // position={line.position}
+              // position={this.state.position}
+              // position={[0, 0, -5]}
+              thickness={0.4}
+            />
+          );
+        })}
       </ViroARScene>
     );
   }
