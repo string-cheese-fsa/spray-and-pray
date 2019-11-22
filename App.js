@@ -105,7 +105,6 @@ export default class ViroSample extends Component {
           {...this.state.sharedProps}
           initialScene={{ scene: InitialARScene }}
         />
-        {/* <View style={localStyles.crosshair} /> */}
       </View>
     );
   }

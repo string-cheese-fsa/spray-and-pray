@@ -66,25 +66,13 @@ export default class Main extends Component {
         .catch(error => console.error(error));
     }, 10); // 100 ms
   }
-
-  // _onTrackingUpdated(state, reason) {
-  //   if (state === ViroConstants.TRACKING_NORMAL) {
-  //     // Show my AR Scene experience
-  //     this.setState({
-  //       coords: [[0, 0, 0]],
-  //     });
-  //   } else if (state == ViroConstants.TRACKING_NONE) {
-  //     // Prompt user to move phone around
-  //     this.setState({
-  //       text: 'Move the phone around!',
-  //     });
-  //   }
-  // }
-
   _onClickState(stateValue, position, source) {
     switch (stateValue) {
       case 1:
-        this.setState({ painting: true });
+        this.setState(prev => ({
+          painting: true,
+          coords: [[prev.x, prev.y, prev.z]],
+        }));
         break;
       case 2:
         this.setState(prevState => {
