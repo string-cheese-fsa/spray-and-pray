@@ -23,6 +23,7 @@ export default class Main extends Component {
       x: 0,
       y: 0,
       z: 0,
+      material: 'red',
       camCoords: [],
       position: [],
       coords: [],
@@ -83,6 +84,7 @@ export default class Main extends Component {
               {
                 points: [...prevState.coords],
                 position: [prevState.x, prevState.y, prevState.z],
+                material: prevState.material,
               },
             ],
             coords: [],
@@ -122,7 +124,7 @@ export default class Main extends Component {
             thickness={0.4}
             // position={this.state.position}
             // position={[0, 0, -5]}
-            // materials={'rainbow'}
+            materials={this.state.material}
             // transformBehaviors={'billboardY'}
           />
         ) : (
@@ -137,6 +139,7 @@ export default class Main extends Component {
               // position={this.state.position}
               // position={[0, 0, -5]}
               // transformBehaviors={'billboardY'}
+              materials={line.material}
               thickness={0.4}
             />
           );
@@ -157,10 +160,14 @@ var styles = StyleSheet.create({
 });
 
 ViroMaterials.createMaterials({
-  rainbow: {
-    shininess: 2.0,
-    lightingModel: 'Lambert',
-    diffuseTexture: require('./res/rainbow_texture.jpg'),
+  red: {
+    diffuseColor: 'red',
+  },
+  blue: {
+    diffuseColor: 'blue',
+  },
+  green: {
+    diffuseColor: 'green',
   },
 });
 
