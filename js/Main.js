@@ -11,10 +11,11 @@ import {
   ViroSphere,
   ViroNode,
   ViroSpotLight,
+  ViroButton,
 } from 'react-viro';
 
 export default class Main extends Component {
-  constructor() {
+  constructor(props) {
     super();
 
     // Set initial state here
@@ -23,7 +24,7 @@ export default class Main extends Component {
       x: 0,
       y: 0,
       z: 0,
-      camCoords: [],
+      camCoords: [0, 0, 0],
       position: [],
       coords: [],
       lines: [],
@@ -32,7 +33,6 @@ export default class Main extends Component {
     this.cameraRef = React.createRef();
     this.sphereRef = React.createRef();
     // bind 'this' to functions
-    // this._onTrackingUpdated = this._onTrackingUpdated.bind(this);
     this._onClickState = this._onClickState.bind(this);
   }
 
@@ -45,7 +45,7 @@ export default class Main extends Component {
             x: orientation.forward[0] * 10,
             y: orientation.forward[1] * 10,
             z: orientation.forward[2] * 10,
-            camCoords: orientation.forward,
+            camCoords: orientation.position,
           }));
           if (this.state.painting) {
             if (this.state.coords.length) {
@@ -64,8 +64,9 @@ export default class Main extends Component {
           }
         })
         .catch(error => console.error(error));
-    }, 10); // 100 ms
+    }, 10);
   }
+
   _onClickState(stateValue, position, source) {
     switch (stateValue) {
       case 1:
@@ -83,6 +84,7 @@ export default class Main extends Component {
               {
                 points: [...prevState.coords],
                 position: [prevState.x, prevState.y, prevState.z],
+                material: this.props.arSceneNavigator.viroAppProps.material,
               },
             ],
             coords: [],
@@ -99,11 +101,10 @@ export default class Main extends Component {
     return (
       <ViroARScene
         ref={this.cameraRef}
-        // onTrackingUpdated={this._onTrackingUpdated}
         onClickState={this._onClickState}
       >
         <ViroText
-          text={`position ${this.state.position}`}
+          text={`color ${this.props.arSceneNavigator.viroAppProps.material}`}
           scale={[0.5, 0.5, 0.5]}
           position={[0, 0, -1]}
           style={styles.helloWorldTextStyle}
@@ -114,16 +115,12 @@ export default class Main extends Component {
           widthSegmentCount={10}
           radius={0.25}
           position={[this.state.x, this.state.y, this.state.z]}
-          transformBehaviors={'billboardY'}
         />
         {this.state.coords.length ? (
           <ViroPolyline
             points={this.state.coords}
             thickness={0.4}
-            // position={this.state.position}
-            // position={[0, 0, -5]}
-            // materials={'rainbow'}
-            // transformBehaviors={'billboardY'}
+            materials={this.props.arSceneNavigator.viroAppProps.material}
           />
         ) : (
           <ViroText text={''} />
@@ -133,10 +130,7 @@ export default class Main extends Component {
             <ViroPolyline
               key={line.points[0]}
               points={line.points}
-              // position={line.position}
-              // position={this.state.position}
-              // position={[0, 0, -5]}
-              // transformBehaviors={'billboardY'}
+              materials={line.material}
               thickness={0.4}
             />
           );
@@ -157,11 +151,19 @@ var styles = StyleSheet.create({
 });
 
 ViroMaterials.createMaterials({
-  rainbow: {
-    shininess: 2.0,
-    lightingModel: 'Lambert',
-    diffuseTexture: require('./res/rainbow_texture.jpg'),
+  red: {
+    diffuseColor: '#EF476F',
   },
+  blue: {
+    diffuseColor: '#26547C',
+  },
+  green: {
+    diffuseColor: '#06D6A0',
+  },
+  orange: {
+    diffuseColor: '#FFD166'
+  },
+
 });
 
 module.exports = Main;
