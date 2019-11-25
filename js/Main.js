@@ -136,7 +136,7 @@ export default class Main extends Component {
           {this.state.coords.length ? (
             <ViroPolyline
               points={this.state.coords}
-              thickness={0.04}
+              thickness={0.008}
               materials={this.props.arSceneNavigator.viroAppProps.material}
             />
           ) : (
@@ -148,7 +148,7 @@ export default class Main extends Component {
                 key={line.points[0]}
                 points={line.points}
                 materials={line.material}
-                thickness={0.04}
+                thickness={0.008}
               />
             );
           })}
