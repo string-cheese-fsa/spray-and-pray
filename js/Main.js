@@ -116,7 +116,7 @@ export default class Main extends Component {
           widthSegmentCount={10}
           radius={0.25}
           position={[this.state.x, this.state.y, this.state.z]}
-          transformBehaviors={'billboardY'}
+          // transformBehaviors={'billboardY'}
         />
         {this.state.coords.length ? (
           <ViroPolyline
