@@ -105,24 +105,46 @@ export default class ViroSample extends Component {
   // Returns the ViroARSceneNavigator which will start the AR experience
   _getARNavigator() {
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: 'rgba(52, 52, 52, 0.8)'} }>
         <ViroARSceneNavigator
           viroAppProps={this.state.sharedProps}
           initialScene={{ scene: InitialARScene }}
         />
         <Text>{this.state.sharedProps.material}</Text>
-        <Button
+        <View style={{ flexDirection: 'row', backgroundColor: 'rgba(52, 52, 52, 0.8)'}}>
+        <TouchableHighlight
+          style = {{...localStyles.colorButtons, backgroundColor: '#26547C'}}
           title="blue"
           onPress={() => {
             this.clickHandler('blue');
-          }}
-        />
-        <Button
+          }}>
+          <Text>Blue</Text>
+        </TouchableHighlight>
+        <TouchableHighlight
+          style = {{...localStyles.colorButtons, backgroundColor: '#EF476F'}}
           title="red"
           onPress={() => {
             this.clickHandler('red');
-          }}
-        />
+          }}>
+            <Text>Red</Text>
+          </TouchableHighlight>
+        <TouchableHighlight
+          style = {{...localStyles.colorButtons, backgroundColor: '#06D6A0'}}
+          title="green"
+          onPress={() => {
+            this.clickHandler('green');
+          }}>
+          <Text>Green</Text>
+        </TouchableHighlight>
+        <TouchableHighlight
+          style = {{...localStyles.colorButtons, backgroundColor: '#FFD166'}}
+          title="orange"
+          onPress={() => {
+            this.clickHandler('orange');
+          }}>
+          <Text>Orange</Text>
+        </TouchableHighlight>
+        </View>
       </View>
     );
   }
@@ -192,6 +214,22 @@ var localStyles = StyleSheet.create({
     paddingBottom: 20,
     marginTop: 10,
     marginBottom: 10,
+    backgroundColor: '#68a0cf',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#fff',
+  },
+  colorButtons: {
+    // display: "flex",
+    flexDirection: 'row',
+    direction: 'ltr',
+    flexWrap: 'wrap',
+    height: 50,
+    width: 50,
+    paddingTop: 5,
+    paddingBottom: 5,
+    marginTop: 5,
+    marginBottom: 5,
     backgroundColor: '#68a0cf',
     borderRadius: 10,
     borderWidth: 1,

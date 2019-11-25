@@ -33,9 +33,7 @@ export default class Main extends Component {
     this.cameraRef = React.createRef();
     this.sphereRef = React.createRef();
     // bind 'this' to functions
-    // this._onTrackingUpdated = this._onTrackingUpdated.bind(this);
     this._onClickState = this._onClickState.bind(this);
-    // this.clickHandler = this.clickHandler.bind(this);
   }
 
   componentDidMount() {
@@ -99,15 +97,10 @@ export default class Main extends Component {
     }
   }
 
-  // clickHandler () {
-  //   this.setState({material: "blue"})
-  // }
-
   render() {
     return (
       <ViroARScene
         ref={this.cameraRef}
-        // onTrackingUpdated={this._onTrackingUpdated}
         onClickState={this._onClickState}
       >
         <ViroText
@@ -122,14 +115,11 @@ export default class Main extends Component {
           widthSegmentCount={10}
           radius={0.25}
           position={[this.state.x, this.state.y, this.state.z]}
-          // transformBehaviors={'billboardY'}
         />
         {this.state.coords.length ? (
           <ViroPolyline
             points={this.state.coords}
             thickness={0.4}
-            // position={this.state.position}
-            // position={[0, 0, -5]}
             materials={this.props.arSceneNavigator.viroAppProps.material}
           />
         ) : (
@@ -140,10 +130,6 @@ export default class Main extends Component {
             <ViroPolyline
               key={line.points[0]}
               points={line.points}
-              // position={line.position}
-              // position={this.state.position}
-              // position={[0, 0, -5]}
-              // transformBehaviors={'billboardY'}
               materials={line.material}
               thickness={0.4}
             />
@@ -166,14 +152,18 @@ var styles = StyleSheet.create({
 
 ViroMaterials.createMaterials({
   red: {
-    diffuseColor: 'red',
+    diffuseColor: '#EF476F',
   },
   blue: {
-    diffuseColor: 'blue',
+    diffuseColor: '#26547C',
   },
   green: {
-    diffuseColor: 'green',
+    diffuseColor: '#06D6A0',
   },
+  orange: {
+    diffuseColor: '#FFD166'
+  },
+
 });
 
 module.exports = Main;
