@@ -7,8 +7,13 @@ const Drawing = db.define('drawing', {
   }
 })
 
-Drawing.beforeValidate((drawing, options) => {
-  drawing.lines = drawing.lines.toString()
+Drawing.beforeValidate(async (drawing, options) => {
+  try {
+    drawing.lines = drawing.lines.toString()
+    await drawing.save()
+  } catch (error) {
+    console.error(error)
+  }
 })
 
 module.exports = Drawing
