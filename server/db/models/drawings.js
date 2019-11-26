@@ -9,8 +9,10 @@ const Drawing = db.define('drawing', {
 
 Drawing.beforeValidate(async (drawing, options) => {
   try {
-    drawing.lines = drawing.lines.toString()
-    await drawing.save()
+    drawing.lines = JSON.stringify(drawing.lines)
+    // await drawing.save()
+    console.log('this is what drawing is', typeof drawing.lines)
+    return drawing
   } catch (error) {
     console.error(error)
   }
