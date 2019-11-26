@@ -56,6 +56,7 @@ export default class ViroSample extends Component {
     )
     this._exitViro = this._exitViro.bind(this)
     this.clickHandler = this.clickHandler.bind(this)
+    this.sceneRef = React.createRef()
   }
 
   // Replace this function with the contents of _getVRNavigator() or _getARNavigator()

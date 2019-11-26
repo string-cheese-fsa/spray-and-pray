@@ -37,6 +37,7 @@ class Main extends Component {
     this.cameraRef = React.createRef()
     this.sphereRef = React.createRef()
     // bind 'this' to functions
+    this.mapSphereZtoPlane = this.mapSphereZtoPlane.bind(this)
     this._onClickState = this._onClickState.bind(this)
   }
 
@@ -46,8 +47,8 @@ class Main extends Component {
         .getCameraOrientationAsync()
         .then(orientation => {
           this.setState(prevState => ({
-            x: orientation.forward[0],
-            z: orientation.forward[1] * -1,
+            x: orientation.forward[0] * 1.25,
+            z: orientation.forward[1] * -1 * 1.25,
             // z: orientation.forward[2] * 10,
             camCoords: orientation.position
           }))
@@ -137,8 +138,17 @@ class Main extends Component {
             heightSegmentCount={10}
             widthSegmentCount={10}
             radius={0.025}
-            // onAnchorFound={this.mapSphereZtoPlane}
+            onAnchorFound={this.mapSphereZtoPlane}
             position={[this.state.x, this.state.y, this.state.z]}
+          />
+          <ViroPolyline
+            points={[
+              [0, 0, 0],
+              [this.state.x, this.state.y, this.state.z]
+            ]}
+            // position={[...this.state.camCoords]}
+            thickness={0.08}
+            materials={'transparent'}
           />
           {this.state.coords.length ? (
             <ViroPolyline
@@ -187,6 +197,9 @@ ViroMaterials.createMaterials({
   },
   orange: {
     diffuseColor: '#FFD166'
+  },
+  transparent: {
+    diffuseColor: 'rgba(55, 55, 55, 0.8)'
   }
 })
 
