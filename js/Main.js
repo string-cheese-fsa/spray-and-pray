@@ -13,8 +13,9 @@ import {
   ViroSpotLight,
   ViroButton,
   ViroARPlaneSelector,
-  ViroImage
-} from "react-viro";
+  ViroImage,
+} from 'react-viro';
+
 
 export default class Main extends Component {
   constructor(props) {
@@ -35,6 +36,7 @@ export default class Main extends Component {
     this.cameraRef = React.createRef();
     this.sphereRef = React.createRef();
     // bind 'this' to functions
+    this.mapSphereZtoPlane = this.mapSphereZtoPlane.bind(this);
     this._onClickState = this._onClickState.bind(this);
   }
 
@@ -44,10 +46,12 @@ export default class Main extends Component {
         .getCameraOrientationAsync()
         .then(orientation => {
           this.setState(prevState => ({
-            x: orientation.forward[0],
-            z: orientation.forward[1] * -1,
+
+            x: orientation.forward[0] * 1.25,
+            z: orientation.forward[1] * -1 * 1.25,
             // z: orientation.forward[2] * 10,
-            camCoords: orientation.position
+            camCoords: orientation.position,
+
           }));
           if (this.state.painting) {
             if (this.state.coords.length) {
@@ -102,14 +106,18 @@ export default class Main extends Component {
   mapSphereZtoPlane(anchor) {
     this.setState({
       // z: anchor.position[1]
-      y: anchor.position[2]
+
+      y: anchor.position[2],
+
     });
   }
 
   render() {
     return (
       <ViroARScene
-        anchorDetectionTypes={["PlanesVertical"]}
+
+        anchorDetectionTypes={['PlanesVertical']}
+
         ref={this.cameraRef}
         onClickState={this._onClickState}
       >
@@ -130,8 +138,19 @@ export default class Main extends Component {
             heightSegmentCount={10}
             widthSegmentCount={10}
             radius={0.025}
-            // onAnchorFound={this.mapSphereZtoPlane}
+
+            onAnchorFound={this.mapSphereZtoPlane}
             position={[this.state.x, this.state.y, this.state.z]}
+          />
+          <ViroPolyline
+            points={[
+              [0, 0, 0],
+              [this.state.x, this.state.y, this.state.z],
+            ]}
+            // position={[...this.state.camCoords]}
+            thickness={0.08}
+            materials={'transparent'}
+
           />
           {this.state.coords.length ? (
             <ViroPolyline
@@ -140,7 +159,9 @@ export default class Main extends Component {
               materials={this.props.arSceneNavigator.viroAppProps.material}
             />
           ) : (
-            <ViroText text={""} />
+
+            <ViroText text={''} />
+
           )}
           {this.state.lines.map(line => {
             return (
@@ -179,8 +200,13 @@ ViroMaterials.createMaterials({
     diffuseColor: "#06D6A0"
   },
   orange: {
-    diffuseColor: "#FFD166"
-  }
+
+    diffuseColor: '#FFD166',
+  },
+  transparent: {
+    diffuseColor: 'rgba(55, 55, 55, 0.8)',
+  },
+
 });
 
 module.exports = Main;
