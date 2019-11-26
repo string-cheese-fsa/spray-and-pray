@@ -55,6 +55,7 @@ export default class ViroSample extends Component {
     );
     this._exitViro = this._exitViro.bind(this);
     this.clickHandler = this.clickHandler.bind(this);
+    this.sceneRef = React.createRef();
   }
 
   // Replace this function with the contents of _getVRNavigator() or _getARNavigator()
@@ -105,45 +106,55 @@ export default class ViroSample extends Component {
   // Returns the ViroARSceneNavigator which will start the AR experience
   _getARNavigator() {
     return (
-      <View style={{ flex: 1, backgroundColor: 'rgba(52, 52, 52, 0.8)'} }>
+      <View style={{ flex: 1, backgroundColor: 'rgba(52, 52, 52, 0.8)' }}>
         <ViroARSceneNavigator
-          viroAppProps={this.state.sharedProps}
+          viroAppProps={{ ...this.state.sharedProps, ref: this.sceneRef }}
           initialScene={{ scene: InitialARScene }}
+          ref={this.sceneRef}
         />
-        <Text>{this.state.sharedProps.material}</Text>
-        <View style={{ flexDirection: 'row', backgroundColor: 'rgba(52, 52, 52, 0.8)'}}>
-        <TouchableHighlight
-          style = {{...localStyles.colorButtons, backgroundColor: '#26547C'}}
-          title="blue"
-          onPress={() => {
-            this.clickHandler('blue');
-          }}>
-          <Text>Blue</Text>
-        </TouchableHighlight>
-        <TouchableHighlight
-          style = {{...localStyles.colorButtons, backgroundColor: '#EF476F'}}
-          title="red"
-          onPress={() => {
-            this.clickHandler('red');
-          }}>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            backgroundColor: 'rgba(52, 52, 52, 0.8)',
+          }}
+        >
+          <TouchableHighlight
+            style={{ ...localStyles.colorButtons, backgroundColor: '#26547C' }}
+            title="blue"
+            onPress={() => {
+              this.clickHandler('blue');
+            }}
+          >
+            <Text>Blue</Text>
+          </TouchableHighlight>
+          <TouchableHighlight
+            style={{ ...localStyles.colorButtons, backgroundColor: '#EF476F' }}
+            title="red"
+            onPress={() => {
+              this.clickHandler('red');
+            }}
+          >
             <Text>Red</Text>
           </TouchableHighlight>
-        <TouchableHighlight
-          style = {{...localStyles.colorButtons, backgroundColor: '#06D6A0'}}
-          title="green"
-          onPress={() => {
-            this.clickHandler('green');
-          }}>
-          <Text>Green</Text>
-        </TouchableHighlight>
-        <TouchableHighlight
-          style = {{...localStyles.colorButtons, backgroundColor: '#FFD166'}}
-          title="orange"
-          onPress={() => {
-            this.clickHandler('orange');
-          }}>
-          <Text>Orange</Text>
-        </TouchableHighlight>
+          <TouchableHighlight
+            style={{ ...localStyles.colorButtons, backgroundColor: '#06D6A0' }}
+            title="green"
+            onPress={() => {
+              this.clickHandler('green');
+            }}
+          >
+            <Text>Green</Text>
+          </TouchableHighlight>
+          <TouchableHighlight
+            style={{ ...localStyles.colorButtons, backgroundColor: '#FFD166' }}
+            title="orange"
+            onPress={() => {
+              this.clickHandler('orange');
+            }}
+          >
+            <Text>Orange</Text>
+          </TouchableHighlight>
         </View>
       </View>
     );
