@@ -56,13 +56,13 @@ const initialState = {
 export default function(state = initialState, action) {
   switch (action.type) {
     case GET_ALL_DRAWINGS: {
-      return { ...state, allDrawings: action.drawings }
+      return { ...state, allDrawings: [state.allDrawings, action.drawings] }
     }
     case SAVE_DRAWING: {
-      return { ...state, singleDrawing: action.drawing }
+      return { ...state, allDrawings: [...state.allDrawings, action.drawing] }
     }
     case DRAW_LINES: {
-      return { ...state, lines: action.lines }
+      return { ...state, lines: [...state.lines, action.lines] }
     }
     default:
       return state
