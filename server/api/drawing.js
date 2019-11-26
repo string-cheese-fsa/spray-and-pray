@@ -13,10 +13,12 @@ router.get('/', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
   try {
-    const lines = req.body.lines
-    const newDrawing = await Drawing.create({ lines })
+    // const lines = req.body
+    const newDrawing = await Drawing.create( {lines: req.body} )
     res.status(201).send(newDrawing)
   } catch (error) {
     next(error)
   }
 })
+
+module.exports = router

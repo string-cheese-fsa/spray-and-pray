@@ -87,7 +87,7 @@ class Main extends Component {
           material: this.props.arSceneNavigator.viroAppProps.material
         }
         this.props.drawLines(drawing)
-        //this.props.saveDrawing(drawing)
+        this.props.saveDrawing(this.props.lines)
         this.setState(prevState => {
           return {
             painting: false,

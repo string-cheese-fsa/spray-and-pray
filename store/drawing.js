@@ -26,7 +26,7 @@ export const drawnLines = lines => ({
 export const getAllDrawings = () => {
   return async dispatch => {
     try {
-      const { data } = await axios.get('/api/drawings')
+      const { data } = await axios.get('http://172.16.21.159:8080/api/drawings')
       dispatch(gotAllDrawings(data))
     } catch (error) {
       console.error(error)
@@ -37,7 +37,7 @@ export const getAllDrawings = () => {
 export const saveDrawing = drawing => {
   return async dispatch => {
     try {
-      const { data } = await axios.post('/api/drawings', drawing)
+      const { data } = await axios.post('http://172.16.21.159:8080/api/drawings', drawing)
       dispatch(savedDrawing(data))
     } catch (error) {
       console.error(error)
