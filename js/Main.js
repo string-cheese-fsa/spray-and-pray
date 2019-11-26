@@ -12,6 +12,8 @@ import {
   ViroNode,
   ViroSpotLight,
   ViroButton,
+  ViroARPlaneSelector,
+  ViroImage,
 } from 'react-viro';
 
 export default class Main extends Component {
@@ -43,9 +45,8 @@ export default class Main extends Component {
         .then(orientation => {
           this.setState(prevState => ({
             x: orientation.forward[0],
-            y: orientation.forward[1],
-            z: orientation.forward[2],
-            // z: -3,
+            z: orientation.forward[1] * -1,
+            // z: orientation.forward[2] * 10,
             camCoords: orientation.position,
           }));
           if (this.state.painting) {
@@ -84,8 +85,7 @@ export default class Main extends Component {
               ...prevState.lines,
               {
                 points: [...prevState.coords],
-                // position: [prevState.x, prevState.y, prevState.z],
-                position: prevState.position,
+                position: [prevState.x, prevState.y, prevState.z],
                 material: this.props.arSceneNavigator.viroAppProps.material,
               },
             ],
@@ -99,42 +99,60 @@ export default class Main extends Component {
     }
   }
 
+  mapSphereZtoPlane(anchor) {
+    this.setState({
+      // z: anchor.position[1]
+      y: anchor.position[2],
+    });
+  }
+
   render() {
     return (
-      <ViroARScene ref={this.cameraRef} onClickState={this._onClickState}>
+      <ViroARScene
+        anchorDetectionTypes={['PlanesVertical']}
+        ref={this.cameraRef}
+        onClickState={this._onClickState}
+      >
         <ViroText
-          text={`z: ${this.state.z}`}
+          position={[0, 0, -2]}
           scale={[0.5, 0.5, 0.5]}
-          position={[0, 0, -1]}
-          style={styles.helloWorldTextStyle}
+          text={`X: ${this.state.x.toFixed(2)} Y: ${this.state.y.toFixed(
+            2
+          )} Z: ${this.state.z.toFixed(2)}`}
         />
-        <ViroSphere
-          ref={this.sphereRef}
-          heightSegmentCount={10}
-          widthSegmentCount={10}
-          radius={0.25}
-          position={[this.state.x, this.state.y, this.state.z]}
-        />
-        {this.state.coords.length ? (
-          <ViroPolyline
-            points={this.state.coords}
-            thickness={0.4}
-            materials={this.props.arSceneNavigator.viroAppProps.material}
-            position={this.state.position}
+        <ViroARPlaneSelector
+          alignment="Vertical"
+          dragType="FixedToPlane"
+          onAnchorFound={this.mapSphereZtoPlane}
+        >
+          <ViroSphere
+            ref={this.sphereRef}
+            heightSegmentCount={10}
+            widthSegmentCount={10}
+            radius={0.025}
+            // onAnchorFound={this.mapSphereZtoPlane}
+            position={[this.state.x, this.state.y, this.state.z]}
           />
-        ) : (
-          <ViroText text={''} />
-        )}
-        {this.state.lines.map(line => {
-          return (
+          {this.state.coords.length ? (
             <ViroPolyline
-              key={line.points[0]}
-              points={line.points}
-              materials={line.material}
-              thickness={0.4}
+              points={this.state.coords}
+              thickness={0.008}
+              materials={this.props.arSceneNavigator.viroAppProps.material}
             />
-          );
-        })}
+          ) : (
+            <ViroText text={''} />
+          )}
+          {this.state.lines.map(line => {
+            return (
+              <ViroPolyline
+                key={line.points[0]}
+                points={line.points}
+                materials={line.material}
+                thickness={0.008}
+              />
+            );
+          })}
+        </ViroARPlaneSelector>
       </ViroARScene>
     );
   }
