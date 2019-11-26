@@ -42,9 +42,10 @@ export default class Main extends Component {
         .getCameraOrientationAsync()
         .then(orientation => {
           this.setState(prevState => ({
-            x: orientation.forward[0] * 10,
-            y: orientation.forward[1] * 10,
-            z: orientation.forward[2] * 10,
+            x: orientation.forward[0],
+            y: orientation.forward[1],
+            z: orientation.forward[2],
+            // z: -3,
             camCoords: orientation.position,
           }));
           if (this.state.painting) {
@@ -83,7 +84,8 @@ export default class Main extends Component {
               ...prevState.lines,
               {
                 points: [...prevState.coords],
-                position: [prevState.x, prevState.y, prevState.z],
+                // position: [prevState.x, prevState.y, prevState.z],
+                position: prevState.position,
                 material: this.props.arSceneNavigator.viroAppProps.material,
               },
             ],
@@ -99,12 +101,9 @@ export default class Main extends Component {
 
   render() {
     return (
-      <ViroARScene
-        ref={this.cameraRef}
-        onClickState={this._onClickState}
-      >
+      <ViroARScene ref={this.cameraRef} onClickState={this._onClickState}>
         <ViroText
-          text={`color ${this.props.arSceneNavigator.viroAppProps.material}`}
+          text={`z: ${this.state.z}`}
           scale={[0.5, 0.5, 0.5]}
           position={[0, 0, -1]}
           style={styles.helloWorldTextStyle}
@@ -121,6 +120,7 @@ export default class Main extends Component {
             points={this.state.coords}
             thickness={0.4}
             materials={this.props.arSceneNavigator.viroAppProps.material}
+            position={this.state.position}
           />
         ) : (
           <ViroText text={''} />
@@ -161,9 +161,8 @@ ViroMaterials.createMaterials({
     diffuseColor: '#06D6A0',
   },
   orange: {
-    diffuseColor: '#FFD166'
+    diffuseColor: '#FFD166',
   },
-
 });
 
 module.exports = Main;
