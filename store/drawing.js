@@ -43,10 +43,9 @@ export const getAllDrawings = () => {
 export const getDrawing = id => {
   return async dispatch => {
     try {
-      const { data } = await axios.get(`${LOCALHOST}/api/drawings/${id}`);
+      let { data } = await axios.get(`${LOCALHOST}/api/drawings/${id}`);
       data = data.lines;
       data = JSON.parse(data);
-      // console.log(typeof data);
       dispatch(gotDrawing(data));
     } catch (error) {
       console.error(error);
