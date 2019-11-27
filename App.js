@@ -14,7 +14,8 @@ import {
   View,
   StyleSheet,
   PixelRatio,
-  TouchableHighlight
+  TouchableHighlight,
+  ImageBackground
 } from "react-native";
 import { Provider } from "react-redux";
 import { ViroVRSceneNavigator, ViroARSceneNavigator } from "react-viro";
@@ -81,9 +82,7 @@ class ViroSample extends Component {
   render() {
     if (this.state.navigatorType == UNSET) {
       return this._getExperienceSelector();
-    } else if (this.state.navigatorType == VR_NAVIGATOR_TYPE) {
-      return this._getVRNavigator();
-    } else if (this.state.navigatorType == AR_NAVIGATOR_TYPE) {
+    }  else if (this.state.navigatorType == AR_NAVIGATOR_TYPE) {
       return this._getARNavigator();
     }
   }
@@ -91,10 +90,12 @@ class ViroSample extends Component {
   // Presents the user with a choice of an AR or VR experience
   _getExperienceSelector() {
     return (
+    <ImageBackground source={{uri: 'https://images-na.ssl-images-amazon.com/images/I/81C1IiM37gL._SX466_.jpg'}} style={{width: '100%', height: '100%'}}>
       <View style={localStyles.outer}>
         <View style={localStyles.inner}>
+
           <Text style={localStyles.titleText}>
-            Choose your desired experience:
+            {`Spray-R  `}
           </Text>
 
           <TouchableHighlight
@@ -102,18 +103,12 @@ class ViroSample extends Component {
             onPress={this._getExperienceButtonOnPress(AR_NAVIGATOR_TYPE)}
             underlayColor={"#68a0ff"}
           >
-            <Text style={localStyles.buttonText}>AR</Text>
+            <Text style={localStyles.buttonText}>Start Drawing</Text>
           </TouchableHighlight>
 
-          <TouchableHighlight
-            style={localStyles.buttons}
-            onPress={this._getExperienceButtonOnPress(VR_NAVIGATOR_TYPE)}
-            underlayColor={"#68a0ff"}
-          >
-            <Text style={localStyles.buttonText}>VR</Text>
-          </TouchableHighlight>
         </View>
       </View>
+      </ImageBackground>
     );
   }
 
@@ -247,20 +242,24 @@ var localStyles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "black"
+    // backgroundColor: "black"
   },
   inner: {
     flex: 1,
     flexDirection: "column",
     alignItems: "center",
-    backgroundColor: "black"
+    // backgroundColor: "black"
   },
   titleText: {
     paddingTop: 30,
     paddingBottom: 20,
     color: "#fff",
     textAlign: "center",
-    fontSize: 25
+    fontSize: 40,
+    fontWeight: 'bold',
+    textShadowColor: 'black',
+    textShadowOffset: {width: 5, height: 5},
+    textShadowRadius: 10
   },
   buttonText: {
     color: "#fff",
