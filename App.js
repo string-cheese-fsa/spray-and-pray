@@ -21,10 +21,11 @@ import { ViroVRSceneNavigator, ViroARSceneNavigator } from "react-viro";
 import { Dimensions, Button } from "react-native";
 import store from "./store";
 import { connect } from "react-redux";
-import { getDrawing } from "./store/drawing";
+import { getDrawing, saveDrawing } from "./store/drawing";
 
 const mapDispatchToProps = dispatch => ({
-  getDrawing: id => dispatch(getDrawing(id))
+  getDrawing: id => dispatch(getDrawing(id)),
+  saveDrawing: drawing => dispatch(saveDrawing(drawing))
 });
 
 /*
@@ -64,10 +65,15 @@ class ViroSample extends Component {
     this.clickHandler = this.clickHandler.bind(this);
     this.sceneRef = React.createRef();
     this.download = this.download.bind(this);
+    this.save = this.save.bind(this);
   }
 
   download(id) {
-    this.props.getDrawing(4);
+    this.props.getDrawing(id);
+  }
+
+  save(drawing) {
+    this.props.saveDrawing(drawing);
   }
 
   // Replace this function with the contents of _getVRNavigator() or _getARNavigator()
@@ -183,10 +189,19 @@ class ViroSample extends Component {
               style={{ ...localStyles.colorButtons }}
               title="download"
               onPress={() => {
-                this.download(4);
+                this.download(8);
               }}
             >
               <Text>Download</Text>
+            </TouchableHighlight>
+            <TouchableHighlight
+              style={{ ...localStyles.colorButtons }}
+              title="download"
+              onPress={() => {
+                this.save(this.props.lines);
+              }}
+            >
+              <Text>Save</Text>
             </TouchableHighlight>
           </View>
         </View>
@@ -304,6 +319,10 @@ var localStyles = StyleSheet.create({
   }
 });
 
-const ConnectedApp = connect(null, mapDispatchToProps)(ViroSample);
+const mapStateToProps = state => ({
+  lines: state.drawing.lines
+});
+
+const ConnectedApp = connect(mapStateToProps, mapDispatchToProps)(ViroSample);
 export default ConnectedApp;
 module.exports = ConnectedApp;
