@@ -123,11 +123,11 @@ class Main extends Component {
           )} Z: ${this.state.z.toFixed(2)}`}
         /> */}
 
-        <ViroText
+        {/* <ViroText
           position={[0, 0, -2]}
           scale={[0.5, 0.5, 0.5]}
           text={`Lines: ${this.props.lines}`}
-        />
+        /> */}
         <ViroARPlaneSelector
           alignment="Vertical"
           dragType="FixedToPlane"
