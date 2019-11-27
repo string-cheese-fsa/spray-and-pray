@@ -87,7 +87,7 @@ class Main extends Component {
           material: this.props.arSceneNavigator.viroAppProps.material
         }
         this.props.drawLines(drawing)
-        //this.props.saveDrawing(drawing)
+        this.props.saveDrawing(this.props.lines)
         this.setState(prevState => {
           return {
             painting: false,
@@ -123,11 +123,11 @@ class Main extends Component {
           )} Z: ${this.state.z.toFixed(2)}`}
         /> */}
 
-        <ViroText
+        {/* <ViroText
           position={[0, 0, -2]}
           scale={[0.5, 0.5, 0.5]}
           text={`Lines: ${this.props.lines}`}
-        />
+        /> */}
         <ViroARPlaneSelector
           alignment="Vertical"
           dragType="FixedToPlane"

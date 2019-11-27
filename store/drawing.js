@@ -1,4 +1,5 @@
 import axios from 'axios'
+const LOCALHOST = require('../secrets')
 
 //ACTION TYPES
 const GET_ALL_DRAWINGS = 'GET_ALL_DRAWINGS'
@@ -26,7 +27,7 @@ export const drawnLines = lines => ({
 export const getAllDrawings = () => {
   return async dispatch => {
     try {
-      const { data } = await axios.get('/api/drawings')
+      const { data } = await axios.get(`${LOCALHOST}/api/drawings`)
       dispatch(gotAllDrawings(data))
     } catch (error) {
       console.error(error)
@@ -37,7 +38,7 @@ export const getAllDrawings = () => {
 export const saveDrawing = drawing => {
   return async dispatch => {
     try {
-      const { data } = await axios.post('/api/drawings', drawing)
+      const { data } = await axios.post(`${LOCALHOST}/api/drawings`, drawing)
       dispatch(savedDrawing(data))
     } catch (error) {
       console.error(error)
