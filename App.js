@@ -7,67 +7,69 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  */
 
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import {
   AppRegistry,
   Text,
   View,
   StyleSheet,
   PixelRatio,
-  TouchableHighlight
-} from 'react-native'
-import { Provider } from 'react-redux'
+  TouchableHighlight,
+  SectionList,
+} from 'react-native';
+import { Provider } from 'react-redux';
 
-import { ViroVRSceneNavigator, ViroARSceneNavigator } from 'react-viro'
-import { Dimensions, Button } from 'react-native'
-import store from './store'
+import { ViroVRSceneNavigator, ViroARSceneNavigator } from 'react-viro';
+import { Dimensions, Button } from 'react-native';
+import store from './store';
 /*
  TODO: Insert your API key below
  */
 var sharedProps = {
-  material: 'red'
-}
+  material: 'red',
+};
 
 // Sets the default scene you want for AR and VR
-var InitialARScene = require('./js/Main')
-var InitialVRScene = require('./js/HelloWorldScene')
+var InitialARScene = require('./js/Main');
+var InitialVRScene = require('./js/HelloWorldScene');
 
-var UNSET = 'UNSET'
-var VR_NAVIGATOR_TYPE = 'VR'
-var AR_NAVIGATOR_TYPE = 'AR'
+var UNSET = 'UNSET';
+var VR_NAVIGATOR_TYPE = 'VR';
+var AR_NAVIGATOR_TYPE = 'AR';
 
 // This determines which type of experience to launch in, or UNSET, if the user should
 // be presented with a choice of AR or VR. By default, we offer the user a choice.
-var defaultNavigatorType = UNSET
+var defaultNavigatorType = UNSET;
 
 export default class ViroSample extends Component {
   constructor() {
-    super()
+    super();
 
     this.state = {
+      allView: false,
       navigatorType: defaultNavigatorType,
-      sharedProps: sharedProps
-    }
-    this._getExperienceSelector = this._getExperienceSelector.bind(this)
-    this._getARNavigator = this._getARNavigator.bind(this)
-    this._getVRNavigator = this._getVRNavigator.bind(this)
+      sharedProps: sharedProps,
+    };
+    this._getExperienceSelector = this._getExperienceSelector.bind(this);
+    this._getARNavigator = this._getARNavigator.bind(this);
+    this._getVRNavigator = this._getVRNavigator.bind(this);
     this._getExperienceButtonOnPress = this._getExperienceButtonOnPress.bind(
       this
-    )
-    this._exitViro = this._exitViro.bind(this)
-    this.clickHandler = this.clickHandler.bind(this)
-    this.sceneRef = React.createRef()
+    );
+    this._exitViro = this._exitViro.bind(this);
+    this.clickHandler = this.clickHandler.bind(this);
+    this.sceneRef = React.createRef();
   }
 
   // Replace this function with the contents of _getVRNavigator() or _getARNavigator()
   // if you are building a specific type of experience.
   render() {
     if (this.state.navigatorType == UNSET) {
-      return this._getExperienceSelector()
+      return this._getExperienceSelector();
     } else if (this.state.navigatorType == VR_NAVIGATOR_TYPE) {
-      return this._getVRNavigator()
+      return this._getVRNavigator();
     } else if (this.state.navigatorType == AR_NAVIGATOR_TYPE) {
-      return this._getARNavigator()
+      return this._getARNavigator();
     }
   }
 
@@ -97,11 +99,11 @@ export default class ViroSample extends Component {
           </TouchableHighlight>
         </View>
       </View>
-    )
+    );
   }
 
   clickHandler(color) {
-    this.setState({ sharedProps: { material: color } })
+    this.setState({ sharedProps: { material: color } });
   }
 
   // Returns the ViroARSceneNavigator which will start the AR experience
@@ -113,21 +115,25 @@ export default class ViroSample extends Component {
             viroAppProps={this.state.sharedProps}
             initialScene={{ scene: InitialARScene }}
           />
-          <Text>{this.state.sharedProps.material}</Text>
+          {this.state.allView && (
+            <View>
+              <SectionList data={store.getState().drawing.allDrawings} />
+            </View>
+          )}
           <View
             style={{
               flexDirection: 'row',
-              backgroundColor: 'rgba(52, 52, 52, 0.8)'
+              backgroundColor: 'rgba(52, 52, 52, 0.8)',
             }}
           >
             <TouchableHighlight
               style={{
                 ...localStyles.colorButtons,
-                backgroundColor: '#26547C'
+                backgroundColor: '#26547C',
               }}
               title="blue"
               onPress={() => {
-                this.clickHandler('blue')
+                this.clickHandler('blue');
               }}
             >
               <Text>Blue</Text>
@@ -135,11 +141,11 @@ export default class ViroSample extends Component {
             <TouchableHighlight
               style={{
                 ...localStyles.colorButtons,
-                backgroundColor: '#EF476F'
+                backgroundColor: '#EF476F',
               }}
               title="red"
               onPress={() => {
-                this.clickHandler('red')
+                this.clickHandler('red');
               }}
             >
               <Text>Red</Text>
@@ -147,11 +153,11 @@ export default class ViroSample extends Component {
             <TouchableHighlight
               style={{
                 ...localStyles.colorButtons,
-                backgroundColor: '#06D6A0'
+                backgroundColor: '#06D6A0',
               }}
               title="green"
               onPress={() => {
-                this.clickHandler('green')
+                this.clickHandler('green');
               }}
             >
               <Text>Green</Text>
@@ -159,11 +165,11 @@ export default class ViroSample extends Component {
             <TouchableHighlight
               style={{
                 ...localStyles.colorButtons,
-                backgroundColor: '#FFD166'
+                backgroundColor: '#FFD166',
               }}
               title="orange"
               onPress={() => {
-                this.clickHandler('orange')
+                this.clickHandler('orange');
               }}
             >
               <Text>Orange</Text>
@@ -171,7 +177,7 @@ export default class ViroSample extends Component {
           </View>
         </View>
       </Provider>
-    )
+    );
   }
 
   // Returns the ViroSceneNavigator which will start the VR experience
@@ -182,7 +188,7 @@ export default class ViroSample extends Component {
         initialScene={{ scene: InitialVRScene }}
         onExitViro={this._exitViro}
       />
-    )
+    );
   }
 
   // This function returns an anonymous/lambda function to be used
@@ -190,47 +196,47 @@ export default class ViroSample extends Component {
   _getExperienceButtonOnPress(navigatorType) {
     return () => {
       this.setState({
-        navigatorType: navigatorType
-      })
-    }
+        navigatorType: navigatorType,
+      });
+    };
   }
 
   // This function "exits" Viro by setting the navigatorType to UNSET.
   _exitViro() {
     this.setState({
-      navigatorType: UNSET
-    })
+      navigatorType: UNSET,
+    });
   }
 }
 
 var localStyles = StyleSheet.create({
   viroContainer: {
     flex: 1,
-    backgroundColor: 'black'
+    backgroundColor: 'black',
   },
   outer: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'black'
+    backgroundColor: 'black',
   },
   inner: {
     flex: 1,
     flexDirection: 'column',
     alignItems: 'center',
-    backgroundColor: 'black'
+    backgroundColor: 'black',
   },
   titleText: {
     paddingTop: 30,
     paddingBottom: 20,
     color: '#fff',
     textAlign: 'center',
-    fontSize: 25
+    fontSize: 25,
   },
   buttonText: {
     color: '#fff',
     textAlign: 'center',
-    fontSize: 20
+    fontSize: 20,
   },
   buttons: {
     height: 80,
@@ -242,7 +248,7 @@ var localStyles = StyleSheet.create({
     backgroundColor: '#68a0cf',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#fff'
+    borderColor: '#fff',
   },
   colorButtons: {
     // display: "flex",
@@ -258,7 +264,7 @@ var localStyles = StyleSheet.create({
     backgroundColor: '#68a0cf',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#fff'
+    borderColor: '#fff',
   },
   exitButton: {
     height: 50,
@@ -270,7 +276,7 @@ var localStyles = StyleSheet.create({
     backgroundColor: '#68a0cf',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#fff'
+    borderColor: '#fff',
   },
   crosshair: {
     position: 'absolute',
@@ -280,8 +286,8 @@ var localStyles = StyleSheet.create({
     height: 20,
     borderRadius: 15,
     borderWidth: 1,
-    backgroundColor: 'grey'
-  }
-})
+    backgroundColor: 'grey',
+  },
+});
 
-module.exports = ViroSample
+module.exports = ViroSample;
