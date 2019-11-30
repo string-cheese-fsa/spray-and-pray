@@ -24,7 +24,6 @@ import { Dimensions, Button } from 'react-native';
 import store from './store';
 import { connect } from 'react-redux';
 import { getDrawing, saveDrawing, getAllDrawings } from './store/drawing';
-import { Drawing } from './js/Drawing';
 
 /*
  TODO: Insert your API key below
@@ -65,7 +64,6 @@ class ViroSample extends Component {
     this.sceneRef = React.createRef();
     this.download = this.download.bind(this);
     this.save = this.save.bind(this);
-    this.viewHandler = this.viewHandler.bind(this);
   }
 
   componentDidMount() {
@@ -121,10 +119,6 @@ class ViroSample extends Component {
     this.setState({ sharedProps: { material: color } });
   }
 
-  viewHandler() {
-    this.setState({ allView: false });
-  }
-
   // Returns the ViroARSceneNavigator which will start the AR experience
   _getARNavigator() {
     return (
@@ -144,7 +138,9 @@ class ViroSample extends Component {
                     style={localStyles.colorButtons}
                     onPress={() => {
                       this.download(drawing.item.id);
-                      this.viewHandler();
+                      this.setState(prev => {
+                        return { allView: !prev.allView };
+                      });
                     }}
                   >
                     <Text>{drawing.item.id}</Text>
