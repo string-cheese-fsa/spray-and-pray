@@ -1,38 +1,40 @@
-import axios from "axios";
-const LOCALHOST = require("../secrets");
+import axios from 'axios';
+const LOCALHOST = require('../secrets');
 
 //ACTION TYPES
-const GET_ALL_DRAWINGS = "GET_ALL_DRAWINGS";
-const GET_DRAWING = "GET_DRAWING";
-const SAVE_DRAWING = "SAVE_DRAWING";
-const DRAW_LINES = "DRAW_LINES";
+const GET_ALL_DRAWINGS = 'GET_ALL_DRAWINGS';
+const GET_DRAWING = 'GET_DRAWING';
+const SAVE_DRAWING = 'SAVE_DRAWING';
+const DRAW_LINES = 'DRAW_LINES';
 
 //ACTION CREATORS
 const gotAllDrawings = drawings => ({
   type: GET_ALL_DRAWINGS,
-  drawings
+  drawings,
 });
 
 const gotDrawing = drawing => ({
   type: GET_DRAWING,
-  drawing
+  drawing,
 });
 
 const savedDrawing = drawing => ({
   type: SAVE_DRAWING,
-  drawing
+  drawing,
 });
 
 export const drawnLines = lines => ({
   type: DRAW_LINES,
-  lines
+  lines,
 });
 
 //THUNKS
 export const getAllDrawings = () => {
   return async dispatch => {
     try {
-      const { data } = await axios.get(`${LOCALHOST}/api/drawings`);
+      let { data } = await axios.get(`${LOCALHOST}/api/drawings`);
+      // let lines = await JSON.parse(data.lines);
+      // data = { ...data, lines: lines };
       dispatch(gotAllDrawings(data));
     } catch (error) {
       console.error(error);
@@ -45,7 +47,7 @@ export const getDrawing = id => {
     try {
       let { data } = await axios.get(`${LOCALHOST}/api/drawings/${id}`);
       data = data.lines;
-      data = JSON.parse(data);
+      data = await JSON.parse(data);
       dispatch(gotDrawing(data));
     } catch (error) {
       console.error(error);
@@ -68,7 +70,7 @@ export const saveDrawing = drawing => {
 const initialState = {
   allDrawings: [],
   singleDrawing: {},
-  lines: []
+  lines: [],
 };
 
 //REDUCER
@@ -78,7 +80,10 @@ export default function(state = initialState, action) {
       return { ...state, lines: action.drawing };
     }
     case GET_ALL_DRAWINGS: {
-      return { ...state, allDrawings: [state.allDrawings, action.drawings] };
+      return {
+        ...state,
+        allDrawings: action.drawings,
+      };
     }
     case SAVE_DRAWING: {
       return { ...state, allDrawings: [...state.allDrawings, action.drawing] };
