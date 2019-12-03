@@ -55,8 +55,8 @@ class ViroSample extends Component {
       allView: false,
       navigatorType: defaultNavigatorType,
       sharedProps: sharedProps,
-      lat: null,
-      long: null
+      lat: 0,
+      long: 0
     }
     this._getExperienceSelector = this._getExperienceSelector.bind(this)
     this._getARNavigator = this._getARNavigator.bind(this)
@@ -75,8 +75,6 @@ class ViroSample extends Component {
   }
 
   async componentDidMount() {
-    this.props.getAllDrawings()
-    // await this.requestLocationPermission()
     await navigator.geolocation.getCurrentPosition(
       this.geoSuccess,
       this.geoFailure,
