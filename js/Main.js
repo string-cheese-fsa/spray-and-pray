@@ -1,4 +1,5 @@
 'use strict';
+let cursor = require('./dotted.png');
 import React, { Component } from 'react';
 import { StyleSheet, PixelRatio, Dimensions, View, Text } from 'react-native';
 import {
@@ -119,10 +120,11 @@ class Main extends Component {
         this.props.arSceneNavigator.viroAppProps.calibratingStatus ===
           'found' ? (
           <ViroARPlaneSelector
-            alignment="Vertical"
-            dragType="FixedToPlane"
+            alignment={'Vertical'}
+            // dragType="FixedToPlane"
             onPlaneSelected={() => {
               this.props.arSceneNavigator.viroAppProps.foundCanvas();
+              clearTimeout(this.props.arSceneNavigator.viroAppProps.timer);
               this.cameraRef.current
                 .getCameraOrientationAsync()
                 .then(orientation => {
@@ -139,18 +141,17 @@ class Main extends Component {
                 });
             }}
           >
-            <ViroPolyline
-              points={[
-                [0, 0, 0],
-                [this.state.x, this.state.y, this.state.z],
-              ]}
-              thickness={0.08}
-              materials={'transparent'}
+            <ViroImage
+              height={0.05}
+              width={0.05}
+              position={[this.state.x, this.state.y, this.state.z]}
+              rotation={[0, 90, 90]}
+              source={cursor}
             />
             {this.state.coords.length ? (
               <ViroPolyline
                 points={this.state.coords}
-                thickness={0.008}
+                thickness={0.01}
                 materials={this.props.arSceneNavigator.viroAppProps.material}
               />
             ) : (
@@ -162,7 +163,7 @@ class Main extends Component {
                   key={line.points[0]}
                   points={line.points}
                   materials={line.material}
-                  thickness={0.008}
+                  thickness={0.01}
                 />
               );
             })}

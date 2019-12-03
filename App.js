@@ -24,6 +24,7 @@ import { getDrawing, saveDrawing, getAllDrawings } from './store/drawing';
 var sharedProps = {
   material: 'red',
   calibratingStatus: '',
+  timer: 0,
 };
 
 // Sets the default scene you want for AR and VR
@@ -65,7 +66,6 @@ class ViroSample extends Component {
   }
 
   componentDidMount() {
-    this.props.getAllDrawings();
     this.setState(previousState => {
       return {
         sharedProps: {
@@ -147,17 +147,7 @@ class ViroSample extends Component {
             initialScene={{ scene: InitialARScene }}
             ref={this.sceneRef}
           />
-          {this.state.sharedProps.calibratingStatus === 'searching' ? (
-            <Text>
-              Calibrating...Please remain still while we find a canvas...
-            </Text>
-          ) : this.state.sharedProps.calibratingStatus === 'found' ? (
-            <Text>Calibration success! Hold the screen to begin painting.</Text>
-          ) : this.state.sharedProps.calibratingStatus === 'failed' ? (
-            <Text>No canvas detected. Please try again.</Text>
-          ) : (
-            <Text>Find a flat surface and click "Start" to begin.</Text>
-          )}
+
           {this.state.allView && this.props.allDrawings.length ? (
             <View>
               <ScrollView
@@ -182,6 +172,17 @@ class ViroSample extends Component {
           ) : (
             <View></View>
           )}
+          {this.state.sharedProps.calibratingStatus === 'searching' ? (
+            <Text>
+              Calibrating...Please remain still while we find a canvas...
+            </Text>
+          ) : this.state.sharedProps.calibratingStatus === 'found' ? (
+            <Text>Calibration success! Hold the screen to begin painting.</Text>
+          ) : this.state.sharedProps.calibratingStatus === 'failed' ? (
+            <Text>No canvas detected. Please try again.</Text>
+          ) : (
+            <Text>Find a flat surface and click "Start" to begin.</Text>
+          )}
           <View
             style={{
               flexDirection: 'row',
@@ -195,7 +196,7 @@ class ViroSample extends Component {
               }}
               title="reset"
               onPress={() => {
-                setTimeout(() => {
+                let timer = setTimeout(() => {
                   if (this.state.sharedProps.calibratingStatus !== 'found') {
                     this.setState(prevState => {
                       return {
@@ -205,11 +206,15 @@ class ViroSample extends Component {
                         },
                       };
                     });
+                    clearTimeout(timer);
+                  } else {
+                    clearTimeout(timer);
                   }
-                }, 5000);
+                }, 8000);
                 this.setState(prevState => {
                   return {
                     sharedProps: {
+                      timer: timer,
                       ...prevState.sharedProps,
                       calibratingStatus: 'searching',
                     },
