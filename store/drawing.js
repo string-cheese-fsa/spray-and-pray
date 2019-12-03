@@ -6,6 +6,7 @@ const GET_ALL_DRAWINGS = 'GET_ALL_DRAWINGS';
 const GET_DRAWING = 'GET_DRAWING';
 const SAVE_DRAWING = 'SAVE_DRAWING';
 const DRAW_LINES = 'DRAW_LINES';
+const GET_NEARBY_DRAWINGS = 'GET_NEARBY_DRAWINGS'
 
 //ACTION CREATORS
 const gotAllDrawings = drawings => ({
@@ -28,6 +29,11 @@ export const drawnLines = lines => ({
   lines,
 });
 
+const gotNearbyDrawings = nearbyDrawings => ({
+  type: GET_NEARBY_DRAWINGS,
+  nearbyDrawings
+})
+
 //THUNKS
 export const getAllDrawings = () => {
   return async dispatch => {
@@ -36,6 +42,19 @@ export const getAllDrawings = () => {
       // let lines = await JSON.parse(data.lines);
       // data = { ...data, lines: lines };
       dispatch(gotAllDrawings(data));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+};
+
+export const getNearbyDrawings = (lat, long) => {
+  return async dispatch => {
+    try {
+      let { data } = await axios.get(`${LOCALHOST}/api/drawings?latitude=${lat}&longitude=${long}`);
+      // let lines = await JSON.parse(data.lines);
+      // data = { ...data, lines: lines };
+      dispatch(gotNearbyDrawings(data));
     } catch (error) {
       console.error(error);
     }
@@ -90,6 +109,12 @@ export default function(state = initialState, action) {
     }
     case DRAW_LINES: {
       return { ...state, lines: [...state.lines, action.lines] };
+    }
+    case GET_NEARBY_DRAWINGS: {
+      return {
+        ...state,
+        allDrawings: action.nearbyDrawings
+      }
     }
     default:
       return state;

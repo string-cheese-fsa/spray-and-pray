@@ -1,5 +1,6 @@
 'use strict';
 let cursor = require('./dotted.png');
+
 import React, { Component } from 'react';
 import { StyleSheet, PixelRatio, Dimensions, View, Text } from 'react-native';
 import {
@@ -30,6 +31,8 @@ class Main extends Component {
       x: 0,
       y: 0,
       z: 0,
+      lat: null,
+      long: null,
       camCoords: [0, 0, 0],
       position: [],
       coords: [],

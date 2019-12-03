@@ -9,13 +9,20 @@ import {
   ImageBackground,
   FlatList,
   ScrollView,
+  PermissionsAndroid,
 } from 'react-native';
 import { Provider } from 'react-redux';
 import { ViroVRSceneNavigator, ViroARSceneNavigator } from 'react-viro';
 import { Dimensions, Button } from 'react-native';
 import store from './store';
 import { connect } from 'react-redux';
-import { getDrawing, saveDrawing, getAllDrawings } from './store/drawing';
+import {
+  getDrawing,
+  saveDrawing,
+  getAllDrawings,
+  getNearbyDrawings,
+} from './store/drawing';
+//import Geolocation from 'react-native-geolocation-service'
 
 /*
  TODO: Insert your API key below
@@ -35,8 +42,8 @@ var VR_NAVIGATOR_TYPE = 'VR';
 var AR_NAVIGATOR_TYPE = 'AR';
 // This determines which type of experience to launch in, or UNSET, if the user should
 // be presented with a choice of AR or VR. By default, we offer the user a choice.
-
 var defaultNavigatorType = UNSET;
+console.disableYellowBox = true;
 class ViroSample extends Component {
   constructor() {
     super();
@@ -45,6 +52,8 @@ class ViroSample extends Component {
       navigatorType: defaultNavigatorType,
       sharedProps: sharedProps,
       text: '',
+      lat: 0,
+      long: 0,
     };
     this._getExperienceSelector = this._getExperienceSelector.bind(this);
     this._getARNavigator = this._getARNavigator.bind(this);
@@ -58,14 +67,15 @@ class ViroSample extends Component {
     this.save = this.save.bind(this);
     this.resetARSession = this.resetARSession.bind(this);
     this.foundCanvas = this.foundCanvas.bind(this);
+    this.geoSuccess = this.geoSuccess.bind(this);
+    this.geoFailure = this.geoFailure.bind(this);
   }
 
   resetARSession() {
     this.sceneRef.current._resetARSession(true, false);
-    // this.setState({ text: this.sceneRef.current });
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.setState(previousState => {
       return {
         sharedProps: {
@@ -75,7 +85,55 @@ class ViroSample extends Component {
         },
       };
     });
+    await navigator.geolocation.getCurrentPosition(
+      this.geoSuccess,
+      this.geoFailure,
+      { enableHighAccuracy: true }
+    );
   }
+
+  geoSuccess = position => {
+    console.log('getting location...');
+    this.setState({
+      lat: position.coords.latitude,
+      long: position.coords.longitude,
+    });
+  };
+  geoFailure = error => {
+    console.log(error.code, error.message);
+  };
+
+  // async requestLocationPermission() {
+  //   try {
+  //     console.log('requesting permission...')
+  //     const granted = await PermissionsAndroid.askAsync(
+  //       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+  //       {
+  //         title: 'Location Permission',
+  //         message:
+  //           'This App needs access to your location ' +
+  //           'so we can know where you are.'
+  //       }
+  //     )
+  //     console.log('what is granted?', granted)
+  //     console.log('type of granted:', typeof granted)
+  //     console.log(
+  //       'PermissionsAndroid.RESULTS.GRANTED:',
+  //       PermissionsAndroid.RESULTS.GRANTED
+  //     )
+  //     console.log(
+  //       'PermissionsAndroid.PERMISSIONS:',
+  //       PermissionsAndroid.PERMISSIONS
+  //     )
+  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+  //       console.log('You can use locations ')
+  //     } else {
+  //       console.log('Location permission denied')
+  //     }
+  //   } catch (err) {
+  //     console.warn(err)
+  //   }
+  // }
 
   download(id) {
     this.props.getDrawing(id);
@@ -147,7 +205,11 @@ class ViroSample extends Component {
             initialScene={{ scene: InitialARScene }}
             ref={this.sceneRef}
           />
-
+          <View>
+            <Text
+              style={{ color: 'white' }}
+            >{`lat: ${this.state.lat}, long: ${this.state.long}`}</Text>
+          </View>
           {this.state.allView && this.props.allDrawings.length ? (
             <View>
               <ScrollView
@@ -277,7 +339,7 @@ class ViroSample extends Component {
               style={{ ...localStyles.colorButtons }}
               title="download"
               onPress={() => {
-                this.props.getAllDrawings();
+                this.props.getNearbyDrawings(this.state.lat, this.state.long);
                 this.setState(prev => {
                   return { allView: !prev.allView };
                 });
@@ -289,7 +351,11 @@ class ViroSample extends Component {
               style={{ ...localStyles.colorButtons }}
               title="save"
               onPress={() => {
-                this.save(this.props.lines);
+                this.save({
+                  lines: this.props.lines,
+                  lat: this.state.lat,
+                  long: this.state.long,
+                });
               }}
             >
               <Text>Save</Text>
@@ -412,6 +478,7 @@ const mapDispatchToProps = dispatch => ({
   getDrawing: id => dispatch(getDrawing(id)),
   saveDrawing: drawing => dispatch(saveDrawing(drawing)),
   getAllDrawings: () => dispatch(getAllDrawings()),
+  getNearbyDrawings: (lat, long) => dispatch(getNearbyDrawings(lat, long)),
 });
 
 const ConnectedApp = connect(mapStateToProps, mapDispatchToProps)(ViroSample);
