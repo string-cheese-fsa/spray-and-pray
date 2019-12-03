@@ -1,7 +1,7 @@
-"use strict";
+'use strict'
 
-import React, { Component } from "react";
-import { StyleSheet, PixelRatio, Dimensions, View, Text } from "react-native";
+import React, { Component } from 'react'
+import { StyleSheet, PixelRatio, Dimensions, View, Text } from 'react-native'
 import {
   ViroARScene,
   ViroText,
@@ -14,31 +14,33 @@ import {
   ViroButton,
   ViroARPlaneSelector,
   ViroImage
-} from "react-viro";
-import { connect } from "react-redux";
-import { getAllDrawings, saveDrawing, drawnLines } from "../store/drawing";
+} from 'react-viro'
+import { connect } from 'react-redux'
+import { getAllDrawings, saveDrawing, drawnLines } from '../store/drawing'
 
 class Main extends Component {
   constructor(props) {
-    super();
+    super()
 
     // Set initial state here
     this.state = {
-      text: "",
+      text: '',
       x: 0,
       y: 0,
       z: 0,
+      lat: null,
+      long: null,
       camCoords: [0, 0, 0],
       position: [],
       coords: [],
       // lines: [],
       painting: false
-    };
-    this.cameraRef = React.createRef();
-    this.sphereRef = React.createRef();
+    }
+    this.cameraRef = React.createRef()
+    this.sphereRef = React.createRef()
     // bind 'this' to functions
-    this.mapSphereZtoPlane = this.mapSphereZtoPlane.bind(this);
-    this._onClickState = this._onClickState.bind(this);
+    this.mapSphereZtoPlane = this.mapSphereZtoPlane.bind(this)
+    this._onClickState = this._onClickState.bind(this)
   }
 
   componentDidMount() {
@@ -51,7 +53,7 @@ class Main extends Component {
             z: orientation.forward[1] * -1 * 1.25,
             // z: orientation.forward[2] * 10,
             camCoords: orientation.position
-          }));
+          }))
           if (this.state.painting) {
             if (this.state.coords.length) {
               this.setState(prevState => ({
@@ -59,17 +61,17 @@ class Main extends Component {
                   ...prevState.coords,
                   [this.state.x, this.state.y, this.state.z]
                 ]
-              }));
+              }))
             } else {
               this.setState(prevState => ({
                 coords: [[this.state.x, this.state.y, this.state.z]],
                 position: [this.state.x, this.state.y, this.state.z]
-              }));
+              }))
             }
           }
         })
-        .catch(error => console.error(error));
-    }, 10);
+        .catch(error => console.error(error))
+    }, 10)
   }
 
   _onClickState(stateValue, position, source) {
@@ -78,25 +80,25 @@ class Main extends Component {
         this.setState(prev => ({
           painting: true,
           coords: [[prev.x, prev.y, prev.z]]
-        }));
-        break;
+        }))
+        break
       case 2:
         const drawing = {
           points: [...this.state.coords],
           position: [this.state.x, this.state.y, this.state.z],
           material: this.props.arSceneNavigator.viroAppProps.material
-        };
-        this.props.drawLines(drawing);
+        }
+        this.props.drawLines(drawing)
         // this.props.saveDrawing(this.props.lines);
         this.setState(prevState => {
           return {
             painting: false,
             coords: []
-          };
-        });
-        break;
+          }
+        })
+        break
       case 3:
-        break;
+        break
       default:
     }
   }
@@ -105,13 +107,13 @@ class Main extends Component {
     this.setState({
       // z: anchor.position[1]
       y: anchor.position[2]
-    });
+    })
   }
 
   render() {
     return (
       <ViroARScene
-        anchorDetectionTypes={["PlanesVertical"]}
+        anchorDetectionTypes={['PlanesVertical']}
         ref={this.cameraRef}
         onClickState={this._onClickState}
       >
@@ -148,7 +150,7 @@ class Main extends Component {
             ]}
             // position={[...this.state.camCoords]}
             thickness={0.08}
-            materials={"transparent"}
+            materials={'transparent'}
           />
           {this.state.coords.length ? (
             <ViroPolyline
@@ -157,7 +159,7 @@ class Main extends Component {
               materials={this.props.arSceneNavigator.viroAppProps.material}
             />
           ) : (
-            <ViroText text={""} />
+            <ViroText text={''} />
           )}
           {this.props.lines.map(line => {
             return (
@@ -167,51 +169,51 @@ class Main extends Component {
                 materials={line.material}
                 thickness={0.008}
               />
-            );
+            )
           })}
         </ViroARPlaneSelector>
       </ViroARScene>
-    );
+    )
   }
 }
 
 var styles = StyleSheet.create({
   helloWorldTextStyle: {
-    fontFamily: "Arial",
+    fontFamily: 'Arial',
     fontSize: 10,
-    color: "#ffffff",
-    textAlignVertical: "center",
-    textAlign: "center"
+    color: '#ffffff',
+    textAlignVertical: 'center',
+    textAlign: 'center'
   }
-});
+})
 
 ViroMaterials.createMaterials({
   red: {
-    diffuseColor: "#EF476F"
+    diffuseColor: '#EF476F'
   },
   blue: {
-    diffuseColor: "#26547C"
+    diffuseColor: '#26547C'
   },
   green: {
-    diffuseColor: "#06D6A0"
+    diffuseColor: '#06D6A0'
   },
   orange: {
-    diffuseColor: "#FFD166"
+    diffuseColor: '#FFD166'
   },
   transparent: {
-    diffuseColor: "rgba(55, 55, 55, 0.8)"
+    diffuseColor: 'rgba(55, 55, 55, 0.8)'
   }
-});
+})
 
 const mapStateToProps = state => ({
   lines: state.drawing.lines
-});
+})
 
 const mapDispatchToProps = dispatch => ({
   drawLines: lines => dispatch(drawnLines(lines)),
   saveDrawing: drawing => dispatch(saveDrawing(drawing))
-});
+})
 
-const ConnectedMain = connect(mapStateToProps, mapDispatchToProps)(Main);
-export default ConnectedMain;
-module.exports = ConnectedMain;
+const ConnectedMain = connect(mapStateToProps, mapDispatchToProps)(Main)
+export default ConnectedMain
+module.exports = ConnectedMain

@@ -25,6 +25,7 @@ import { Dimensions, Button } from 'react-native'
 import store from './store'
 import { connect } from 'react-redux'
 import { getDrawing, saveDrawing, getAllDrawings } from './store/drawing'
+//import Geolocation from 'react-native-geolocation-service'
 
 /*
  TODO: Insert your API key below
@@ -44,7 +45,7 @@ var AR_NAVIGATOR_TYPE = 'AR'
 // This determines which type of experience to launch in, or UNSET, if the user should
 // be presented with a choice of AR or VR. By default, we offer the user a choice.
 var defaultNavigatorType = UNSET
-
+console.disableYellowBox = true
 class ViroSample extends Component {
   constructor() {
     super()
@@ -52,7 +53,9 @@ class ViroSample extends Component {
     this.state = {
       allView: false,
       navigatorType: defaultNavigatorType,
-      sharedProps: sharedProps
+      sharedProps: sharedProps,
+      lat: null,
+      long: null
     }
     this._getExperienceSelector = this._getExperienceSelector.bind(this)
     this._getARNavigator = this._getARNavigator.bind(this)
@@ -65,10 +68,29 @@ class ViroSample extends Component {
     this.sceneRef = React.createRef()
     this.download = this.download.bind(this)
     this.save = this.save.bind(this)
+    this.getNavCoords = this.getNavCoords.bind(this)
+    this.geoSuccess = this.geoSuccess.bind(this)
+    this.geoFailure = this.geoFailure.bind(this)
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.props.getAllDrawings()
+    await navigator.geolocation.getCurrentPosition(
+      this.geoSuccess,
+      this.geoFailure,
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 20000 }
+    )
+  }
+
+  geoSuccess = position => {
+    console.log('getting location...')
+    this.setState({
+      lat: position.coords.latitude,
+      long: position.coords.longitude
+    })
+  }
+  geoFailure = error => {
+    console.log(error.code, error.message)
   }
 
   download(id) {
@@ -77,6 +99,25 @@ class ViroSample extends Component {
 
   save(drawing) {
     this.props.saveDrawing(drawing)
+  }
+
+  getNavCoords() {
+    console.log('getting coords...')
+    console.log('what is navigator?', navigator)
+    console.log('what is navigator.geolocation?', navigator.geolocation)
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        console.log(
+          `position: (${position.coords.latitude}, ${position.coords.longitude})`
+        )
+        this.setState({
+          lat: position.coords.latitude,
+          long: position.coords.longitude
+        })
+      },
+      error => console.log(error.code, error.message),
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 20000 }
+    )
   }
 
   // Replace this function with the contents of _getVRNavigator() or _getARNavigator()
@@ -129,6 +170,11 @@ class ViroSample extends Component {
             viroAppProps={this.state.sharedProps}
             initialScene={{ scene: InitialARScene }}
           />
+          <View>
+            <Text
+              style={{ color: 'white' }}
+            >{`lat: ${this.state.lat}, long: ${this.state.long}`}</Text>
+          </View>
           {this.state.allView && this.props.allDrawings.length ? (
             <View>
               <ScrollView

@@ -5,6 +5,13 @@ const Drawing = db.define('drawing', {
   lines: {
     type: Sequelize.TEXT
   }
+  // ,
+  // latitude: {
+  //   type: Sequelize.FLOAT
+  // },
+  // longitude: {
+  //   type: Sequelize.FLOAT
+  // }
 })
 
 Drawing.beforeValidate(async (drawing, options) => {
