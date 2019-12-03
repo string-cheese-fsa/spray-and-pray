@@ -17,7 +17,8 @@ import {
   TouchableHighlight,
   ImageBackground,
   FlatList,
-  ScrollView
+  ScrollView,
+  PermissionsAndroid
 } from 'react-native'
 import { Provider } from 'react-redux'
 import { ViroVRSceneNavigator, ViroARSceneNavigator } from 'react-viro'
@@ -68,17 +69,18 @@ class ViroSample extends Component {
     this.sceneRef = React.createRef()
     this.download = this.download.bind(this)
     this.save = this.save.bind(this)
-    this.getNavCoords = this.getNavCoords.bind(this)
     this.geoSuccess = this.geoSuccess.bind(this)
     this.geoFailure = this.geoFailure.bind(this)
+    // this.requestLocationPermission = this.requestLocationPermission.bind(this)
   }
 
   async componentDidMount() {
     this.props.getAllDrawings()
+    // await this.requestLocationPermission()
     await navigator.geolocation.getCurrentPosition(
       this.geoSuccess,
       this.geoFailure,
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 20000 }
+      { enableHighAccuracy: true }
     )
   }
 
@@ -93,31 +95,44 @@ class ViroSample extends Component {
     console.log(error.code, error.message)
   }
 
+  // async requestLocationPermission() {
+  //   try {
+  //     console.log('requesting permission...')
+  //     const granted = await PermissionsAndroid.askAsync(
+  //       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+  //       {
+  //         title: 'Location Permission',
+  //         message:
+  //           'This App needs access to your location ' +
+  //           'so we can know where you are.'
+  //       }
+  //     )
+  //     console.log('what is granted?', granted)
+  //     console.log('type of granted:', typeof granted)
+  //     console.log(
+  //       'PermissionsAndroid.RESULTS.GRANTED:',
+  //       PermissionsAndroid.RESULTS.GRANTED
+  //     )
+  //     console.log(
+  //       'PermissionsAndroid.PERMISSIONS:',
+  //       PermissionsAndroid.PERMISSIONS
+  //     )
+  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+  //       console.log('You can use locations ')
+  //     } else {
+  //       console.log('Location permission denied')
+  //     }
+  //   } catch (err) {
+  //     console.warn(err)
+  //   }
+  // }
+
   download(id) {
     this.props.getDrawing(id)
   }
 
   save(drawing) {
     this.props.saveDrawing(drawing)
-  }
-
-  getNavCoords() {
-    console.log('getting coords...')
-    console.log('what is navigator?', navigator)
-    console.log('what is navigator.geolocation?', navigator.geolocation)
-    navigator.geolocation.getCurrentPosition(
-      position => {
-        console.log(
-          `position: (${position.coords.latitude}, ${position.coords.longitude})`
-        )
-        this.setState({
-          lat: position.coords.latitude,
-          long: position.coords.longitude
-        })
-      },
-      error => console.log(error.code, error.message),
-      { enableHighAccuracy: true, timeout: 5000, maximumAge: 20000 }
-    )
   }
 
   // Replace this function with the contents of _getVRNavigator() or _getARNavigator()
