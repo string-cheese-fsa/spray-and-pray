@@ -1,13 +1,4 @@
-/**
- * Copyright (c) 2017-present, Viro, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- */
-
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import {
   AppRegistry,
   Text,
@@ -18,80 +9,99 @@ import {
   ImageBackground,
   FlatList,
   ScrollView,
-  PermissionsAndroid
-} from 'react-native'
-import { Provider } from 'react-redux'
-import { ViroVRSceneNavigator, ViroARSceneNavigator } from 'react-viro'
-import { Dimensions, Button } from 'react-native'
-import store from './store'
-import { connect } from 'react-redux'
-import { getDrawing, saveDrawing, getAllDrawings, getNearbyDrawings } from './store/drawing'
+  PermissionsAndroid,
+} from 'react-native';
+import { Provider } from 'react-redux';
+import { ViroVRSceneNavigator, ViroARSceneNavigator } from 'react-viro';
+import { Dimensions, Button } from 'react-native';
+import store from './store';
+import { connect } from 'react-redux';
+import {
+  getDrawing,
+  saveDrawing,
+  getAllDrawings,
+  getNearbyDrawings,
+} from './store/drawing';
 //import Geolocation from 'react-native-geolocation-service'
 
 /*
  TODO: Insert your API key below
  */
+
 var sharedProps = {
-  material: 'red'
-}
+  material: 'red',
+  calibratingStatus: '',
+  timer: 0,
+};
 
 // Sets the default scene you want for AR and VR
-var InitialARScene = require('./js/Main')
-var InitialVRScene = require('./js/HelloWorldScene')
-
-var UNSET = 'UNSET'
-var VR_NAVIGATOR_TYPE = 'VR'
-var AR_NAVIGATOR_TYPE = 'AR'
-
+var InitialARScene = require('./js/Main');
+var InitialVRScene = require('./js/HelloWorldScene');
+var UNSET = 'UNSET';
+var VR_NAVIGATOR_TYPE = 'VR';
+var AR_NAVIGATOR_TYPE = 'AR';
 // This determines which type of experience to launch in, or UNSET, if the user should
 // be presented with a choice of AR or VR. By default, we offer the user a choice.
-var defaultNavigatorType = UNSET
-console.disableYellowBox = true
+var defaultNavigatorType = UNSET;
+console.disableYellowBox = true;
 class ViroSample extends Component {
   constructor() {
-    super()
-
+    super();
     this.state = {
       allView: false,
       navigatorType: defaultNavigatorType,
       sharedProps: sharedProps,
+      text: '',
       lat: 0,
-      long: 0
-    }
-    this._getExperienceSelector = this._getExperienceSelector.bind(this)
-    this._getARNavigator = this._getARNavigator.bind(this)
-    this._getVRNavigator = this._getVRNavigator.bind(this)
+      long: 0,
+    };
+    this._getExperienceSelector = this._getExperienceSelector.bind(this);
+    this._getARNavigator = this._getARNavigator.bind(this);
     this._getExperienceButtonOnPress = this._getExperienceButtonOnPress.bind(
       this
-    )
-    this._exitViro = this._exitViro.bind(this)
-    this.clickHandler = this.clickHandler.bind(this)
-    this.sceneRef = React.createRef()
-    this.download = this.download.bind(this)
-    this.save = this.save.bind(this)
-    this.geoSuccess = this.geoSuccess.bind(this)
-    this.geoFailure = this.geoFailure.bind(this)
-    // this.requestLocationPermission = this.requestLocationPermission.bind(this)
+    );
+    this._exitViro = this._exitViro.bind(this);
+    this.clickHandler = this.clickHandler.bind(this);
+    this.sceneRef = React.createRef();
+    this.download = this.download.bind(this);
+    this.save = this.save.bind(this);
+    this.resetARSession = this.resetARSession.bind(this);
+    this.foundCanvas = this.foundCanvas.bind(this);
+    this.geoSuccess = this.geoSuccess.bind(this);
+    this.geoFailure = this.geoFailure.bind(this);
+  }
+
+  resetARSession() {
+    this.sceneRef.current._resetARSession(true, false);
   }
 
   async componentDidMount() {
+    this.setState(previousState => {
+      return {
+        sharedProps: {
+          ...previousState.sharedProps,
+          resetARSession: this.resetARSession,
+          foundCanvas: this.foundCanvas,
+        },
+      };
+    });
     await navigator.geolocation.getCurrentPosition(
       this.geoSuccess,
       this.geoFailure,
       { enableHighAccuracy: true }
-    )
+    );
   }
 
   geoSuccess = position => {
-    console.log('getting location...')
+    console.log('getting location...');
     this.setState({
       lat: position.coords.latitude,
-      long: position.coords.longitude
-    })
-  }
+      long: position.coords.longitude,
+    });
+  };
   geoFailure = error => {
-    console.log(error.code, error.message)
-  }
+    console.log(error.code, error.message);
+  };
 
   // async requestLocationPermission() {
   //   try {
@@ -126,20 +136,20 @@ class ViroSample extends Component {
   // }
 
   download(id) {
-    this.props.getDrawing(id)
+    this.props.getDrawing(id);
   }
 
   save(drawing) {
-    this.props.saveDrawing(drawing)
+    this.props.saveDrawing(drawing);
   }
 
   // Replace this function with the contents of _getVRNavigator() or _getARNavigator()
   // if you are building a specific type of experience.
   render() {
     if (this.state.navigatorType == UNSET) {
-      return this._getExperienceSelector()
+      return this._getExperienceSelector();
     } else if (this.state.navigatorType == AR_NAVIGATOR_TYPE) {
-      return this._getARNavigator()
+      return this._getARNavigator();
     }
   }
 
@@ -149,14 +159,13 @@ class ViroSample extends Component {
       <ImageBackground
         source={{
           uri:
-            'https://images-na.ssl-images-amazon.com/images/I/81C1IiM37gL._SX466_.jpg'
+            'https://images-na.ssl-images-amazon.com/images/I/81C1IiM37gL._SX466_.jpg',
         }}
         style={{ width: '100%', height: '100%' }}
       >
         <View style={localStyles.outer}>
           <View style={localStyles.inner}>
             <Text style={localStyles.titleText}>{`Spray-R  `}</Text>
-
             <TouchableHighlight
               style={localStyles.buttons}
               onPress={this._getExperienceButtonOnPress(AR_NAVIGATOR_TYPE)}
@@ -167,11 +176,23 @@ class ViroSample extends Component {
           </View>
         </View>
       </ImageBackground>
-    )
+    );
   }
 
   clickHandler(color) {
-    this.setState({ sharedProps: { material: color } })
+    this.setState(previousState => {
+      return {
+        sharedProps: { ...previousState.sharedProps, material: color },
+      };
+    });
+  }
+
+  foundCanvas() {
+    this.setState(prevState => {
+      return {
+        sharedProps: { ...prevState.sharedProps, calibratingStatus: 'found' },
+      };
+    });
   }
 
   // Returns the ViroARSceneNavigator which will start the AR experience
@@ -182,6 +203,7 @@ class ViroSample extends Component {
           <ViroARSceneNavigator
             viroAppProps={this.state.sharedProps}
             initialScene={{ scene: InitialARScene }}
+            ref={this.sceneRef}
           />
           <View>
             <Text
@@ -198,51 +220,81 @@ class ViroSample extends Component {
                   <TouchableHighlight
                     style={localStyles.colorButtons}
                     onPress={() => {
-                      this.download(drawing.id)
+                      this.download(drawing.id);
                       this.setState(prev => {
-                        return { allView: !prev.allView }
-                      })
+                        return { allView: !prev.allView };
+                      });
                     }}
                   >
                     <Text>{drawing.id}</Text>
                   </TouchableHighlight>
                 ))}
               </ScrollView>
-              {/* <FlatList
-                keyExtractor={item => `${item.id}`}
-                data={this.props.allDrawings}
-                renderItem={drawing => (
-                  <TouchableHighlight
-                    style={localStyles.colorButtons}
-                    onPress={() => {
-                      this.download(drawing.item.id);
-                      this.setState(prev => {
-                        return { allView: !prev.allView };
-                      });
-                    }}
-                  >
-                    <Text>{drawing.item.id}</Text>
-                  </TouchableHighlight>
-                )}
-              /> */}
             </View>
           ) : (
             <View></View>
           )}
+          {this.state.sharedProps.calibratingStatus === 'searching' ? (
+            <Text>
+              Calibrating...Please remain still while we find a canvas...
+            </Text>
+          ) : this.state.sharedProps.calibratingStatus === 'found' ? (
+            <Text>Calibration success! Hold the screen to begin painting.</Text>
+          ) : this.state.sharedProps.calibratingStatus === 'failed' ? (
+            <Text>No canvas detected. Please try again.</Text>
+          ) : (
+            <Text>Find a flat surface and click "Start" to begin.</Text>
+          )}
           <View
             style={{
               flexDirection: 'row',
-              backgroundColor: 'rgba(52, 52, 52, 0.8)'
+              backgroundColor: 'rgba(52, 52, 52, 0.8)',
             }}
           >
             <TouchableHighlight
               style={{
                 ...localStyles.colorButtons,
-                backgroundColor: '#26547C'
+                backgroundColor: '#26547C',
+              }}
+              title="reset"
+              onPress={() => {
+                let timer = setTimeout(() => {
+                  if (this.state.sharedProps.calibratingStatus !== 'found') {
+                    this.setState(prevState => {
+                      return {
+                        sharedProps: {
+                          ...prevState.sharedProps,
+                          calibratingStatus: 'failed',
+                        },
+                      };
+                    });
+                    clearTimeout(timer);
+                  } else {
+                    clearTimeout(timer);
+                  }
+                }, 8000);
+                this.setState(prevState => {
+                  return {
+                    sharedProps: {
+                      timer: timer,
+                      ...prevState.sharedProps,
+                      calibratingStatus: 'searching',
+                    },
+                  };
+                });
+                this.resetARSession();
+              }}
+            >
+              <Text>Start</Text>
+            </TouchableHighlight>
+            <TouchableHighlight
+              style={{
+                ...localStyles.colorButtons,
+                backgroundColor: '#26547C',
               }}
               title="blue"
               onPress={() => {
-                this.clickHandler('blue')
+                this.clickHandler('blue');
               }}
             >
               <Text>Blue</Text>
@@ -250,11 +302,11 @@ class ViroSample extends Component {
             <TouchableHighlight
               style={{
                 ...localStyles.colorButtons,
-                backgroundColor: '#EF476F'
+                backgroundColor: '#EF476F',
               }}
               title="red"
               onPress={() => {
-                this.clickHandler('red')
+                this.clickHandler('red');
               }}
             >
               <Text>Red</Text>
@@ -262,11 +314,11 @@ class ViroSample extends Component {
             <TouchableHighlight
               style={{
                 ...localStyles.colorButtons,
-                backgroundColor: '#06D6A0'
+                backgroundColor: '#06D6A0',
               }}
               title="green"
               onPress={() => {
-                this.clickHandler('green')
+                this.clickHandler('green');
               }}
             >
               <Text>Green</Text>
@@ -274,11 +326,11 @@ class ViroSample extends Component {
             <TouchableHighlight
               style={{
                 ...localStyles.colorButtons,
-                backgroundColor: '#FFD166'
+                backgroundColor: '#FFD166',
               }}
               title="orange"
               onPress={() => {
-                this.clickHandler('orange')
+                this.clickHandler('orange');
               }}
             >
               <Text>Orange</Text>
@@ -287,10 +339,10 @@ class ViroSample extends Component {
               style={{ ...localStyles.colorButtons }}
               title="download"
               onPress={() => {
-                this.props.getNearbyDrawings(this.state.lat, this.state.long)
+                this.props.getNearbyDrawings(this.state.lat, this.state.long);
                 this.setState(prev => {
-                  return { allView: !prev.allView }
-                })
+                  return { allView: !prev.allView };
+                });
               }}
             >
               <Text>Download</Text>
@@ -302,8 +354,8 @@ class ViroSample extends Component {
                 this.save({
                   lines: this.props.lines,
                   lat: this.state.lat,
-                  long: this.state.long
-                })
+                  long: this.state.long,
+                });
               }}
             >
               <Text>Save</Text>
@@ -311,18 +363,7 @@ class ViroSample extends Component {
           </View>
         </View>
       </Provider>
-    )
-  }
-
-  // Returns the ViroSceneNavigator which will start the VR experience
-  _getVRNavigator() {
-    return (
-      <ViroVRSceneNavigator
-        {...this.state.sharedProps}
-        initialScene={{ scene: InitialVRScene }}
-        onExitViro={this._exitViro}
-      />
-    )
+    );
   }
 
   // This function returns an anonymous/lambda function to be used
@@ -330,34 +371,34 @@ class ViroSample extends Component {
   _getExperienceButtonOnPress(navigatorType) {
     return () => {
       this.setState({
-        navigatorType: navigatorType
-      })
-    }
+        navigatorType: navigatorType,
+      });
+    };
   }
 
   // This function "exits" Viro by setting the navigatorType to UNSET.
   _exitViro() {
     this.setState({
-      navigatorType: UNSET
-    })
+      navigatorType: UNSET,
+    });
   }
 }
 
 var localStyles = StyleSheet.create({
   viroContainer: {
     flex: 1,
-    backgroundColor: 'black'
+    backgroundColor: 'black',
   },
   outer: {
     flex: 1,
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
     // backgroundColor: "black"
   },
   inner: {
     flex: 1,
     flexDirection: 'column',
-    alignItems: 'center'
+    alignItems: 'center',
     // backgroundColor: "black"
   },
   titleText: {
@@ -369,12 +410,12 @@ var localStyles = StyleSheet.create({
     fontWeight: 'bold',
     textShadowColor: 'black',
     textShadowOffset: { width: 5, height: 5 },
-    textShadowRadius: 10
+    textShadowRadius: 10,
   },
   buttonText: {
     color: '#fff',
     textAlign: 'center',
-    fontSize: 20
+    fontSize: 20,
   },
   buttons: {
     height: 80,
@@ -386,7 +427,7 @@ var localStyles = StyleSheet.create({
     backgroundColor: '#68a0cf',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#fff'
+    borderColor: '#fff',
   },
   colorButtons: {
     // display: "flex",
@@ -402,7 +443,7 @@ var localStyles = StyleSheet.create({
     backgroundColor: '#68a0cf',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#fff'
+    borderColor: '#fff',
   },
   exitButton: {
     height: 50,
@@ -414,7 +455,7 @@ var localStyles = StyleSheet.create({
     backgroundColor: '#68a0cf',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#fff'
+    borderColor: '#fff',
   },
   crosshair: {
     position: 'absolute',
@@ -424,22 +465,22 @@ var localStyles = StyleSheet.create({
     height: 20,
     borderRadius: 15,
     borderWidth: 1,
-    backgroundColor: 'grey'
-  }
-})
+    backgroundColor: 'grey',
+  },
+});
 
 const mapStateToProps = state => ({
   lines: state.drawing.lines,
-  allDrawings: state.drawing.allDrawings
-})
+  allDrawings: state.drawing.allDrawings,
+});
 
 const mapDispatchToProps = dispatch => ({
   getDrawing: id => dispatch(getDrawing(id)),
   saveDrawing: drawing => dispatch(saveDrawing(drawing)),
   getAllDrawings: () => dispatch(getAllDrawings()),
-  getNearbyDrawings: (lat, long) => dispatch(getNearbyDrawings(lat, long))
-})
+  getNearbyDrawings: (lat, long) => dispatch(getNearbyDrawings(lat, long)),
+});
 
-const ConnectedApp = connect(mapStateToProps, mapDispatchToProps)(ViroSample)
-export default ConnectedApp
-module.exports = ConnectedApp
+const ConnectedApp = connect(mapStateToProps, mapDispatchToProps)(ViroSample);
+export default ConnectedApp;
+module.exports = ConnectedApp;
