@@ -25,7 +25,7 @@ import { ViroVRSceneNavigator, ViroARSceneNavigator } from 'react-viro'
 import { Dimensions, Button } from 'react-native'
 import store from './store'
 import { connect } from 'react-redux'
-import { getDrawing, saveDrawing, getAllDrawings } from './store/drawing'
+import { getDrawing, saveDrawing, getAllDrawings, getNearbyDrawings } from './store/drawing'
 //import Geolocation from 'react-native-geolocation-service'
 
 /*
@@ -289,7 +289,7 @@ class ViroSample extends Component {
               style={{ ...localStyles.colorButtons }}
               title="download"
               onPress={() => {
-                this.props.getAllDrawings()
+                this.props.getNearbyDrawings(this.state.lat, this.state.long)
                 this.setState(prev => {
                   return { allView: !prev.allView }
                 })
@@ -301,7 +301,11 @@ class ViroSample extends Component {
               style={{ ...localStyles.colorButtons }}
               title="save"
               onPress={() => {
-                this.save(this.props.lines)
+                this.save({
+                  lines: this.props.lines,
+                  lat: this.state.lat,
+                  long: this.state.long
+                })
               }}
             >
               <Text>Save</Text>
@@ -434,7 +438,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   getDrawing: id => dispatch(getDrawing(id)),
   saveDrawing: drawing => dispatch(saveDrawing(drawing)),
-  getAllDrawings: () => dispatch(getAllDrawings())
+  getAllDrawings: () => dispatch(getAllDrawings()),
+  getNearbyDrawings: (lat, long) => dispatch(getNearbyDrawings(lat, long))
 })
 
 const ConnectedApp = connect(mapStateToProps, mapDispatchToProps)(ViroSample)
