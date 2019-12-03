@@ -17,7 +17,8 @@ import {
   TouchableHighlight,
   ImageBackground,
   FlatList,
-  ScrollView
+  ScrollView,
+  PermissionsAndroid
 } from 'react-native'
 import { Provider } from 'react-redux'
 import { ViroVRSceneNavigator, ViroARSceneNavigator } from 'react-viro'
@@ -25,6 +26,7 @@ import { Dimensions, Button } from 'react-native'
 import store from './store'
 import { connect } from 'react-redux'
 import { getDrawing, saveDrawing, getAllDrawings } from './store/drawing'
+//import Geolocation from 'react-native-geolocation-service'
 
 /*
  TODO: Insert your API key below
@@ -44,7 +46,7 @@ var AR_NAVIGATOR_TYPE = 'AR'
 // This determines which type of experience to launch in, or UNSET, if the user should
 // be presented with a choice of AR or VR. By default, we offer the user a choice.
 var defaultNavigatorType = UNSET
-
+console.disableYellowBox = true
 class ViroSample extends Component {
   constructor() {
     super()
@@ -52,7 +54,9 @@ class ViroSample extends Component {
     this.state = {
       allView: false,
       navigatorType: defaultNavigatorType,
-      sharedProps: sharedProps
+      sharedProps: sharedProps,
+      lat: null,
+      long: null
     }
     this._getExperienceSelector = this._getExperienceSelector.bind(this)
     this._getARNavigator = this._getARNavigator.bind(this)
@@ -65,11 +69,63 @@ class ViroSample extends Component {
     this.sceneRef = React.createRef()
     this.download = this.download.bind(this)
     this.save = this.save.bind(this)
+    this.geoSuccess = this.geoSuccess.bind(this)
+    this.geoFailure = this.geoFailure.bind(this)
+    // this.requestLocationPermission = this.requestLocationPermission.bind(this)
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.props.getAllDrawings()
+    // await this.requestLocationPermission()
+    await navigator.geolocation.getCurrentPosition(
+      this.geoSuccess,
+      this.geoFailure,
+      { enableHighAccuracy: true }
+    )
   }
+
+  geoSuccess = position => {
+    console.log('getting location...')
+    this.setState({
+      lat: position.coords.latitude,
+      long: position.coords.longitude
+    })
+  }
+  geoFailure = error => {
+    console.log(error.code, error.message)
+  }
+
+  // async requestLocationPermission() {
+  //   try {
+  //     console.log('requesting permission...')
+  //     const granted = await PermissionsAndroid.askAsync(
+  //       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+  //       {
+  //         title: 'Location Permission',
+  //         message:
+  //           'This App needs access to your location ' +
+  //           'so we can know where you are.'
+  //       }
+  //     )
+  //     console.log('what is granted?', granted)
+  //     console.log('type of granted:', typeof granted)
+  //     console.log(
+  //       'PermissionsAndroid.RESULTS.GRANTED:',
+  //       PermissionsAndroid.RESULTS.GRANTED
+  //     )
+  //     console.log(
+  //       'PermissionsAndroid.PERMISSIONS:',
+  //       PermissionsAndroid.PERMISSIONS
+  //     )
+  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+  //       console.log('You can use locations ')
+  //     } else {
+  //       console.log('Location permission denied')
+  //     }
+  //   } catch (err) {
+  //     console.warn(err)
+  //   }
+  // }
 
   download(id) {
     this.props.getDrawing(id)
@@ -129,6 +185,11 @@ class ViroSample extends Component {
             viroAppProps={this.state.sharedProps}
             initialScene={{ scene: InitialARScene }}
           />
+          <View>
+            <Text
+              style={{ color: 'white' }}
+            >{`lat: ${this.state.lat}, long: ${this.state.long}`}</Text>
+          </View>
           {this.state.allView && this.props.allDrawings.length ? (
             <View>
               <ScrollView
