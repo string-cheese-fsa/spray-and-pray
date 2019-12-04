@@ -1,5 +1,5 @@
 'use strict';
-let cursor = require('./dotted.png');
+let cursor = require('./can.png');
 
 import React, { Component } from 'react';
 import { StyleSheet, PixelRatio, Dimensions, View, Text } from 'react-native';
@@ -15,7 +15,7 @@ import {
   ViroButton,
   ViroARPlaneSelector,
   ViroImage,
-  ViroARPlane,
+  ViroController,
 } from 'react-viro';
 
 import { connect } from 'react-redux';
@@ -145,16 +145,21 @@ class Main extends Component {
             }}
           >
             <ViroImage
-              height={0.05}
-              width={0.05}
-              position={[this.state.x, this.state.y, this.state.z]}
+              height={0.1}
+              width={0.1}
+              position={[
+                this.state.x + 0.035,
+                this.state.y,
+                this.state.z + 0.04,
+              ]}
+              materials={this.props.arSceneNavigator.viroAppProps.material}
               rotation={[0, 90, 90]}
               source={cursor}
             />
             {this.state.coords.length ? (
               <ViroPolyline
                 points={this.state.coords}
-                thickness={0.01}
+                thickness={0.015}
                 materials={this.props.arSceneNavigator.viroAppProps.material}
               />
             ) : (
@@ -166,7 +171,7 @@ class Main extends Component {
                   key={line.points[0]}
                   points={line.points}
                   materials={line.material}
-                  thickness={0.01}
+                  thickness={0.015}
                 />
               );
             })}
