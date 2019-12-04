@@ -205,14 +205,42 @@ class ViroSample extends Component {
             initialScene={{ scene: InitialARScene }}
             ref={this.sceneRef}
           />
-          <View>
-            <Text
-              style={{ color: 'white' }}
-            >{`lat: ${this.state.lat}, long: ${this.state.long}`}</Text>
+          <View
+            style={{
+              position: 'absolute',
+              // top: Dimensions.get('window').height / 2,
+              backgroundColor: 'rgba(52, 52, 52, 0.5)',
+              flexDirection: 'row',
+              alignSelf: 'center',
+            }}
+          >
+            {this.state.sharedProps.calibratingStatus === 'searching' ? (
+              <Text style={{ ...localStyles.instructions, color: 'blue' }}>
+                Calibrating...Please remain still while we find a canvas...
+              </Text>
+            ) : this.state.sharedProps.calibratingStatus === 'found' ? (
+              <Text style={{ ...localStyles.instructions, color: 'green' }}>
+                Calibration success! Hold the screen to begin painting.
+              </Text>
+            ) : this.state.sharedProps.calibratingStatus === 'failed' ? (
+              <Text style={{ ...localStyles.instructions, color: 'red' }}>
+                No canvas detected. Please try again.
+              </Text>
+            ) : (
+              <Text style={{ ...localStyles.instructions, color: 'white' }}>
+                Find a flat surface and click "Start" to begin.
+              </Text>
+            )}
           </View>
+
           {this.state.allView && this.props.allDrawings.length ? (
-            <View>
+            <View style={{ left: Dimensions.get('window').width / 2 }}>
               <ScrollView
+                style={{
+                  position: 'absolute',
+                  bottom: Dimensions.get('window').height / 12,
+                  backgroundColor: 'rgba(52, 52, 52, 0)',
+                }}
                 horizontal={true}
                 showsHorizontalScrollIndicator={true}
               >
@@ -234,21 +262,15 @@ class ViroSample extends Component {
           ) : (
             <View></View>
           )}
-          {this.state.sharedProps.calibratingStatus === 'searching' ? (
-            <Text>
-              Calibrating...Please remain still while we find a canvas...
-            </Text>
-          ) : this.state.sharedProps.calibratingStatus === 'found' ? (
-            <Text>Calibration success! Hold the screen to begin painting.</Text>
-          ) : this.state.sharedProps.calibratingStatus === 'failed' ? (
-            <Text>No canvas detected. Please try again.</Text>
-          ) : (
-            <Text>Find a flat surface and click "Start" to begin.</Text>
-          )}
           <View
             style={{
+              flex: 1,
+              position: 'absolute',
+              top: (Dimensions.get('window').height * 11) / 12,
               flexDirection: 'row',
-              backgroundColor: 'rgba(52, 52, 52, 0.8)',
+              backgroundColor: 'rgba(52, 52, 52, 0)',
+              alignSelf: 'center',
+              justifyContent: 'center',
             }}
           >
             <TouchableHighlight
@@ -466,6 +488,11 @@ var localStyles = StyleSheet.create({
     borderRadius: 15,
     borderWidth: 1,
     backgroundColor: 'grey',
+  },
+  instructions: {
+    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 });
 
