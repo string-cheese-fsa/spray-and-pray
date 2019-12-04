@@ -32,7 +32,6 @@ var sharedProps = {
   material: 'red',
   calibratingStatus: '',
   timer: 0,
-  painting: false,
 };
 
 // Sets the default scene you want for AR and VR
