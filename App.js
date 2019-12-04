@@ -32,6 +32,7 @@ var sharedProps = {
   material: 'red',
   calibratingStatus: '',
   timer: 0,
+  painting: false,
 };
 
 // Sets the default scene you want for AR and VR
@@ -247,6 +248,7 @@ class ViroSample extends Component {
                 {this.props.allDrawings.map(drawing => (
                   <TouchableHighlight
                     style={localStyles.colorButtons}
+                    key={drawing.id}
                     onPress={() => {
                       this.download(drawing.id);
                       this.setState(prev => {
@@ -276,9 +278,9 @@ class ViroSample extends Component {
             <TouchableHighlight
               style={{
                 ...localStyles.colorButtons,
-                backgroundColor: '#26547C',
+                backgroundColor: 'green',
               }}
-              title="reset"
+              title="start"
               onPress={() => {
                 let timer = setTimeout(() => {
                   if (this.state.sharedProps.calibratingStatus !== 'found') {
