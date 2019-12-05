@@ -2,20 +2,14 @@
 let cursor = require('./can.png');
 
 import React, { Component } from 'react';
-import { StyleSheet, PixelRatio, Dimensions, View, Text } from 'react-native';
+
 import {
   ViroARScene,
   ViroText,
-  ViroConstants,
   ViroPolyline,
   ViroMaterials,
-  ViroSphere,
-  ViroNode,
-  ViroSpotLight,
-  ViroButton,
   ViroARPlaneSelector,
   ViroImage,
-  ViroController,
 } from 'react-viro';
 
 import { connect } from 'react-redux';
@@ -24,23 +18,18 @@ import { getAllDrawings, saveDrawing, drawnLines } from '../store/drawing';
 class Main extends Component {
   constructor(props) {
     super();
-
-    // Set initial state here
     this.state = {
-      text: '',
       x: 0,
       y: 0,
       z: 0,
-      lat: null,
-      long: null,
+      lat: 0,
+      long: 0,
       camCoords: [0, 0, 0],
       position: [],
       coords: [],
       painting: false,
     };
     this.cameraRef = React.createRef();
-    this.sphereRef = React.createRef();
-    // bind 'this' to functions
     this.mapSphereZtoPlane = this.mapSphereZtoPlane.bind(this);
     this._onClickState = this._onClickState.bind(this);
     this.orientCamera = this.orientCamera.bind(this);
@@ -183,16 +172,6 @@ class Main extends Component {
     );
   }
 }
-
-var styles = StyleSheet.create({
-  helloWorldTextStyle: {
-    fontFamily: 'Arial',
-    fontSize: 10,
-    color: '#ffffff',
-    textAlignVertical: 'center',
-    textAlign: 'center',
-  },
-});
 
 ViroMaterials.createMaterials({
   red: {
