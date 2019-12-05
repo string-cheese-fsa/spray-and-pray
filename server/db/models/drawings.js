@@ -10,15 +10,18 @@ const Drawing = db.define('drawing', {
   },
   longitude: {
     type: Sequelize.FLOAT
+  },
+  title: {
+    type: Sequelize.STRING,
+    validate: {
+      notEmpty: true
+    }
   }
 })
 
 Drawing.beforeValidate(async (drawing, options) => {
   try {
     drawing.lines = JSON.stringify(drawing.lines)
-    // await drawing.save()
-    console.log('this is what drawing is', typeof drawing.lines)
-    console.log('this is drawing: ', drawing)
     return drawing
   } catch (error) {
     console.error(error)
