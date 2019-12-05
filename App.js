@@ -1,34 +1,26 @@
 import React, { Component } from 'react'
 import {
-  AppRegistry,
   Text,
   View,
   StyleSheet,
-  PixelRatio,
   TouchableHighlight,
   ImageBackground,
-  FlatList,
   ScrollView,
-  // PermissionsAndroid,
+  Dimensions,
   TextInput,
   Alert
 } from 'react-native'
-import { Provider } from 'react-redux'
-import { ViroVRSceneNavigator, ViroARSceneNavigator } from 'react-viro'
-import { Dimensions, Button } from 'react-native'
+import { Provider, connect } from 'react-redux'
+import { ViroARSceneNavigator } from 'react-viro'
 import store from './store'
-import { connect } from 'react-redux'
 import {
   getDrawing,
   saveDrawing,
   getAllDrawings,
-  getNearbyDrawings
+  getNearbyDrawings,
+  undo,
+  clear
 } from './store/drawing'
-//import Geolocation from 'react-native-geolocation-service'
-
-/*
- TODO: Insert your API key below
- */
 
 var sharedProps = {
   material: 'red',
@@ -36,16 +28,12 @@ var sharedProps = {
   timer: 0
 }
 
-// Sets the default scene you want for AR and VR
 var InitialARScene = require('./js/Main')
-var InitialVRScene = require('./js/HelloWorldScene')
 var UNSET = 'UNSET'
-var VR_NAVIGATOR_TYPE = 'VR'
 var AR_NAVIGATOR_TYPE = 'AR'
-// This determines which type of experience to launch in, or UNSET, if the user should
-// be presented with a choice of AR or VR. By default, we offer the user a choice.
 var defaultNavigatorType = UNSET
 console.disableYellowBox = true
+
 class ViroSample extends Component {
   constructor() {
     super()
@@ -108,38 +96,6 @@ class ViroSample extends Component {
     console.log(error.code, error.message)
   }
 
-  // async requestLocationPermission() {
-  //   try {
-  //     console.log('requesting permission...')
-  //     const granted = await PermissionsAndroid.askAsync(
-  //       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-  //       {
-  //         title: 'Location Permission',
-  //         message:
-  //           'This App needs access to your location ' +
-  //           'so we can know where you are.'
-  //       }
-  //     )
-  //     console.log('what is granted?', granted)
-  //     console.log('type of granted:', typeof granted)
-  //     console.log(
-  //       'PermissionsAndroid.RESULTS.GRANTED:',
-  //       PermissionsAndroid.RESULTS.GRANTED
-  //     )
-  //     console.log(
-  //       'PermissionsAndroid.PERMISSIONS:',
-  //       PermissionsAndroid.PERMISSIONS
-  //     )
-  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-  //       console.log('You can use locations ')
-  //     } else {
-  //       console.log('Location permission denied')
-  //     }
-  //   } catch (err) {
-  //     console.warn(err)
-  //   }
-  // }
-
   download(id) {
     this.props.getDrawing(id)
   }
@@ -164,8 +120,6 @@ class ViroSample extends Component {
     })
   }
 
-  // Replace this function with the contents of _getVRNavigator() or _getARNavigator()
-  // if you are building a specific type of experience.
   render() {
     if (this.state.navigatorType == UNSET) {
       return this._getExperienceSelector()
@@ -174,7 +128,6 @@ class ViroSample extends Component {
     }
   }
 
-  // Presents the user with a choice of an AR or VR experience
   _getExperienceSelector() {
     return (
       <ImageBackground
@@ -216,7 +169,6 @@ class ViroSample extends Component {
     })
   }
 
-  // Returns the ViroARSceneNavigator which will start the AR experience
   _getARNavigator() {
     return (
       <Provider store={store}>
@@ -229,7 +181,6 @@ class ViroSample extends Component {
           <View
             style={{
               position: 'absolute',
-              // top: Dimensions.get('window').height / 2,
               backgroundColor: 'rgba(52, 52, 52, 0.5)',
               flexDirection: 'row',
               alignSelf: 'center'
@@ -371,6 +322,20 @@ class ViroSample extends Component {
                 <Text>Start</Text>
               </TouchableHighlight>
               <TouchableHighlight
+                style={localStyles.colorButtons}
+                title="undo"
+                onPress={this.props.undo}
+              >
+                <Text>Undo</Text>
+              </TouchableHighlight>
+              <TouchableHighlight
+                style={localStyles.colorButtons}
+                title="clear"
+                onPress={this.props.clear}
+              >
+                <Text>Clear</Text>
+              </TouchableHighlight>
+              <TouchableHighlight
                 style={{
                   ...localStyles.colorButtons,
                   backgroundColor: '#26547C'
@@ -448,8 +413,6 @@ class ViroSample extends Component {
     )
   }
 
-  // This function returns an anonymous/lambda function to be used
-  // by the experience selector buttons
   _getExperienceButtonOnPress(navigatorType) {
     return () => {
       this.setState({
@@ -458,7 +421,6 @@ class ViroSample extends Component {
     }
   }
 
-  // This function "exits" Viro by setting the navigatorType to UNSET.
   _exitViro() {
     this.setState({
       navigatorType: UNSET
@@ -475,13 +437,11 @@ var localStyles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center'
-    // backgroundColor: "black"
   },
   inner: {
     flex: 1,
     flexDirection: 'column',
     alignItems: 'center'
-    // backgroundColor: "black"
   },
   titleText: {
     paddingTop: 30,
@@ -512,7 +472,6 @@ var localStyles = StyleSheet.create({
     borderColor: '#fff'
   },
   colorButtons: {
-    // display: "flex",
     flexDirection: 'row',
     direction: 'ltr',
     flexWrap: 'wrap',
@@ -574,6 +533,8 @@ const mapDispatchToProps = dispatch => ({
   getDrawing: id => dispatch(getDrawing(id)),
   saveDrawing: drawing => dispatch(saveDrawing(drawing)),
   getAllDrawings: () => dispatch(getAllDrawings()),
+  undo: () => dispatch(undo()),
+  clear: () => dispatch(clear()),
   getNearbyDrawings: (lat, long) => dispatch(getNearbyDrawings(lat, long))
 })
 
