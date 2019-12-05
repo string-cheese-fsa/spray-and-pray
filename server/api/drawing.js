@@ -1,6 +1,6 @@
-const router = require('express').Router();
-const { Drawing } = require('../db/models');
-const Sequelize = require('sequelize');
+const router = require('express').Router()
+const { Drawing } = require('../db/models')
+const Sequelize = require('sequelize')
 
 const Op = Sequelize.Op
 
@@ -22,17 +22,17 @@ const Op = Sequelize.Op
 
 router.get('/:id', async (req, res, next) => {
   try {
-    const drawing = await Drawing.findOne({ where: { id: req.params.id } });
-    res.send(drawing);
+    const drawing = await Drawing.findOne({ where: { id: req.params.id } })
+    res.send(drawing)
   } catch (error) {
-    next(error);
+    next(error)
   }
-});
+})
 
 router.get('/', async (req, res, next) => {
   try {
-  let lat = parseFloat(req.query.latitude)
-  let long = parseFloat(req.query.longitude)
+    let lat = parseFloat(req.query.latitude)
+    let long = parseFloat(req.query.longitude)
     const nearbyDrawings = await Drawing.findAll({
       where: {
         latitude: {
@@ -51,17 +51,16 @@ router.get('/', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
   try {
-    // const lines = req.body
-    console.log(req.body)
     const newDrawing = await Drawing.create({
       lines: req.body.lines,
       latitude: req.body.lat,
-      longitude: req.body.long
-     });
-    res.status(201).send(newDrawing);
+      longitude: req.body.long,
+      title: req.body.title
+    })
+    res.status(201).send(newDrawing)
   } catch (error) {
-    next(error);
+    next(error)
   }
-});
+})
 
-module.exports = router;
+module.exports = router

@@ -10,7 +10,8 @@ import {
   FlatList,
   ScrollView,
   // PermissionsAndroid,
-  TextInput
+  TextInput,
+  Alert
 } from 'react-native'
 import { Provider } from 'react-redux'
 import { ViroVRSceneNavigator, ViroARSceneNavigator } from 'react-viro'
@@ -144,11 +145,17 @@ class ViroSample extends Component {
   }
 
   save(drawing) {
-    this.props.saveDrawing(drawing)
-    this.setState({
-      showSaveForm: false,
-      title: ''
-    })
+    if (this.state.title === '') {
+      Alert.alert('Error', 'Title cannot be blank!', [{ text: 'OK' }], {
+        cancelable: false
+      })
+    } else {
+      this.props.saveDrawing(drawing)
+      this.setState({
+        showSaveForm: false,
+        title: ''
+      })
+    }
   }
 
   getSaveForm() {
@@ -251,7 +258,7 @@ class ViroSample extends Component {
               <ScrollView
                 style={{
                   position: 'absolute',
-                  bottom: Dimensions.get('window').height / 12,
+                  bottom: Dimensions.get('window').height / 14,
                   backgroundColor: 'rgba(52, 52, 52, 0)'
                 }}
                 horizontal={true}
@@ -268,7 +275,7 @@ class ViroSample extends Component {
                       })
                     }}
                   >
-                    <Text>{drawing.id}</Text>
+                    <Text>{drawing.title}</Text>
                   </TouchableHighlight>
                 ))}
               </ScrollView>
@@ -277,31 +284,43 @@ class ViroSample extends Component {
             <View></View>
           )}
           {this.state.showSaveForm ? (
-            <View style={{ padding: 10 }}>
+            <View style={localStyles.saveForm}>
               <Text style={{ ...localStyles.instructions, color: 'white' }}>
-                Please enter the title of your creation
+                Please enter the title of your creation:
               </Text>
               <TextInput
-                style={{ height: 40 }}
+                style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
                 placeholder="Title"
                 placeholderTextColor="white"
                 selectionColor="white"
-                onChangeText={title => this.setState({ title })}
+                onChangeText={text => this.setState({ title: text })}
                 value={this.state.title}
               />
-              <TouchableHighlight
-                style={{ ...localStyles.colorButtons }}
-                title="Save"
-                onPress={() => {
-                  this.save({
-                    lines: this.props.lines,
-                    lat: this.state.lat,
-                    long: this.state.long
-                  })
-                }}
-              >
-                <Text>Save</Text>
-              </TouchableHighlight>
+              <View style={{ flex: 1, flexDirection: 'row' }}>
+                <TouchableHighlight
+                  style={{ ...localStyles.colorButtons }}
+                  title="Save"
+                  onPress={() => {
+                    this.save({
+                      lines: this.props.lines,
+                      lat: this.state.lat,
+                      long: this.state.long,
+                      title: this.state.title
+                    })
+                  }}
+                >
+                  <Text>Save</Text>
+                </TouchableHighlight>
+                <TouchableHighlight
+                  style={{ ...localStyles.colorButtons }}
+                  title="Go back"
+                  onPress={() => {
+                    this.setState({ showSaveForm: false })
+                  }}
+                >
+                  <Text>Go back</Text>
+                </TouchableHighlight>
+              </View>
             </View>
           ) : (
             <View
@@ -416,7 +435,7 @@ class ViroSample extends Component {
                 title="save"
                 onPress={() => {
                   this.setState(prev => {
-                    return { showSaveForm: !prev.showSaveForm }
+                    return { allView: false, showSaveForm: !prev.showSaveForm }
                   })
                 }}
               >
@@ -519,6 +538,15 @@ var localStyles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#fff'
+  },
+  saveForm: {
+    position: 'absolute',
+    bottom: Dimensions.get('window').height / 5,
+    left: Dimensions.get('window').width / 14,
+    padding: 10,
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center'
   },
   crosshair: {
     position: 'absolute',
