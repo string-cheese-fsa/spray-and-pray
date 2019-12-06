@@ -8,7 +8,8 @@ import {
   ScrollView,
   Dimensions,
   TextInput,
-  Alert
+  Alert,
+  Image
 } from 'react-native'
 import { Provider, connect } from 'react-redux'
 import { ViroARSceneNavigator } from 'react-viro'
@@ -204,37 +205,70 @@ class ViroSample extends Component {
               </Text>
             )}
           </View>
-          {this.state.allView && this.props.allDrawings.length ? (
-            <View style={{ left: Dimensions.get('window').width / 2 }}>
-              <ScrollView
+          {this.state.sharedProps.calibratingStatus === '' || this.state.sharedProps.calibratingStatus === 'failed' ? (
+            <View
+            style={{
+              flex: 1,
+              position: 'absolute',
+              top: (Dimensions.get('window').height/2),
+              flexDirection: 'row',
+              alignSelf: 'center',
+              justifyContent: 'center',
+              alignContent: "center",
+              alignItems: "center"
+            }}
+            >
+            <TouchableHighlight
                 style={{
-                  position: 'absolute',
-                  bottom: Dimensions.get('window').height / 14,
-                  backgroundColor: 'rgba(52, 52, 52, 0)'
+                  ...localStyles.colorButtons,
+                  backgroundColor: 'green',
+                  height: 100,
+                  width: 100,
+                  borderRadius: 50,
+                  textAlign: 'center'
                 }}
-                horizontal={true}
-                showsHorizontalScrollIndicator={true}
-              >
-                {this.props.allDrawings.map(drawing => (
-                  <TouchableHighlight
-                    style={localStyles.colorButtons}
-                    key={drawing.id}
-                    onPress={() => {
-                      this.download(drawing.id)
-                      this.setState(prev => {
-                        return { allView: !prev.allView }
+                title="start"
+                onPress={() => {
+                  let timer = setTimeout(() => {
+                    if (this.state.sharedProps.calibratingStatus !== 'found') {
+                      this.setState(prevState => {
+                        return {
+                          sharedProps: {
+                            ...prevState.sharedProps,
+                            calibratingStatus: 'failed'
+                          }
+                        }
                       })
-                    }}
-                  >
-                    <Text>{drawing.title}</Text>
-                  </TouchableHighlight>
-                ))}
-              </ScrollView>
-            </View>
-          ) : (
-            <View></View>
-          )}
-          {this.state.showSaveForm ? (
+                      clearTimeout(timer)
+                    } else {
+                      clearTimeout(timer)
+                    }
+                  }, 8000)
+                  this.setState(prevState => {
+                    return {
+                      sharedProps: {
+                        timer: timer,
+                        ...prevState.sharedProps,
+                        calibratingStatus: 'searching'
+                      }
+                    }
+                  })
+                  this.resetARSession()
+                }}
+              >
+                <Text
+                  style={{
+                    textAlign: "center",
+                    textAlignVertical: "center",
+                    left: 30,
+                    top: 35,
+                    color: "white",
+                    fontWeight: "bold"
+                }}
+                >Start</Text>
+          </TouchableHighlight>
+          </View>
+          ) : this.state.showSaveForm ? (
             <View style={localStyles.saveForm}>
               <Text style={{ ...localStyles.instructions, color: 'white' }}>
                 Please enter the title of your creation:
@@ -273,16 +307,16 @@ class ViroSample extends Component {
                 </TouchableHighlight>
               </View>
             </View>
-          ) : (
+          ) : this.state.sharedProps.calibratingStatus !== 'searching' ? (
+            <View>
             <View
               style={{
-                flex: 1,
+                // flex: 1,
                 position: 'absolute',
-                top: (Dimensions.get('window').height * 11) / 12,
-                flexDirection: 'row',
-                backgroundColor: 'rgba(52, 52, 52, 0)',
-                alignSelf: 'center',
-                justifyContent: 'center'
+                bottom: ((Dimensions.get('window').height/8)*4),
+                // flexDirection: 'row',
+                // alignSelf: 'center',
+                // justifyContent: 'center'
               }}
             >
               <TouchableHighlight
@@ -292,6 +326,7 @@ class ViroSample extends Component {
                 }}
                 title="start"
                 onPress={() => {
+                  this.props.clear()
                   let timer = setTimeout(() => {
                     if (this.state.sharedProps.calibratingStatus !== 'found') {
                       this.setState(prevState => {
@@ -319,69 +354,45 @@ class ViroSample extends Component {
                   this.resetARSession()
                 }}
               >
-                <Text>Start</Text>
+                <Image
+                  style={{
+                    height: 30,
+                    width: 30,
+                    left: 9,
+                    top: 5
+                  }}
+                  source={require('./js/res/icons8-synchronize-50.png')}
+                />
               </TouchableHighlight>
               <TouchableHighlight
                 style={localStyles.colorButtons}
                 title="undo"
                 onPress={this.props.undo}
               >
-                <Text>Undo</Text>
+                <Image
+                  style={{
+                    height: 30,
+                    width: 30,
+                    left: 9,
+                    top: 5
+                  }}
+                  source={require('./js/res/icons8-undo-50.png')}
+                />
               </TouchableHighlight>
               <TouchableHighlight
                 style={localStyles.colorButtons}
                 title="clear"
                 onPress={this.props.clear}
               >
-                <Text>Clear</Text>
-              </TouchableHighlight>
-              <TouchableHighlight
-                style={{
-                  ...localStyles.colorButtons,
-                  backgroundColor: '#26547C'
-                }}
-                title="blue"
-                onPress={() => {
-                  this.clickHandler('blue')
-                }}
-              >
-                <Text>Blue</Text>
-              </TouchableHighlight>
-              <TouchableHighlight
-                style={{
-                  ...localStyles.colorButtons,
-                  backgroundColor: '#EF476F'
-                }}
-                title="red"
-                onPress={() => {
-                  this.clickHandler('red')
-                }}
-              >
-                <Text>Red</Text>
-              </TouchableHighlight>
-              <TouchableHighlight
-                style={{
-                  ...localStyles.colorButtons,
-                  backgroundColor: '#06D6A0'
-                }}
-                title="green"
-                onPress={() => {
-                  this.clickHandler('green')
-                }}
-              >
-                <Text>Green</Text>
-              </TouchableHighlight>
-              <TouchableHighlight
-                style={{
-                  ...localStyles.colorButtons,
-                  backgroundColor: '#FFD166'
-                }}
-                title="orange"
-                onPress={() => {
-                  this.clickHandler('orange')
-                }}
-              >
-                <Text>Orange</Text>
+                <Image
+                  style={{
+                    height: 30,
+                    width: 30,
+                    left: 9,
+                    top: 5
+                  }}
+                  source={require('./js/res/icons8-delete-50.png')}
+                />
               </TouchableHighlight>
               <TouchableHighlight
                 style={{ ...localStyles.colorButtons }}
@@ -393,7 +404,15 @@ class ViroSample extends Component {
                   })
                 }}
               >
-                <Text>Download</Text>
+                <Image
+                  style={{
+                    height: 30,
+                    width: 30,
+                    left: 9,
+                    top: 5
+                  }}
+                  source={require('./js/res/icons8-download-from-the-cloud-50.png')}
+                />
               </TouchableHighlight>
               <TouchableHighlight
                 style={{ ...localStyles.colorButtons }}
@@ -404,9 +423,108 @@ class ViroSample extends Component {
                   })
                 }}
               >
-                <Text>Save</Text>
+                <Image
+                  style={{
+                    height: 30,
+                    width: 30,
+                    left: 9,
+                    top: 5
+                  }}
+                  source={require('./js/res/icons8-save-50.png')}
+                />
               </TouchableHighlight>
             </View>
+            <ScrollView
+              horizontal={true}
+              style={{
+                flex: 1,
+                position: 'absolute',
+                bottom: 1,
+                flexDirection: 'row',
+                backgroundColor: 'rgba(52, 52, 52, 0)',
+                alignSelf: 'center',
+              }}
+            >
+              <TouchableHighlight
+                style={{
+                  ...localStyles.colorButtons,
+                  backgroundColor: '#26547C'
+                }}
+                title="blue"
+                onPress={() => {
+                  this.clickHandler('blue')
+                }}
+              >
+                <Text></Text>
+              </TouchableHighlight>
+              <TouchableHighlight
+                style={{
+                  ...localStyles.colorButtons,
+                  backgroundColor: '#EF476F'
+                }}
+                title="red"
+                onPress={() => {
+                  this.clickHandler('red')
+                }}
+              >
+                <Text></Text>
+              </TouchableHighlight>
+              <TouchableHighlight
+                style={{
+                  ...localStyles.colorButtons,
+                  backgroundColor: '#06D6A0'
+                }}
+                title="green"
+                onPress={() => {
+                  this.clickHandler('green')
+                }}
+              >
+                <Text></Text>
+              </TouchableHighlight>
+              <TouchableHighlight
+                style={{
+                  ...localStyles.colorButtons,
+                  backgroundColor: '#FFD166'
+                }}
+                title="orange"
+                onPress={() => {
+                  this.clickHandler('orange')
+                }}
+              >
+                <Text></Text>
+              </TouchableHighlight>
+            </ScrollView>
+            </View>
+          ) : <View></View>}
+          {this.state.allView && this.props.allDrawings.length ? (
+            <View style={{ left: Dimensions.get('window').width / 2 }}>
+              <ScrollView
+                style={{
+                  position: 'absolute',
+                  bottom: Dimensions.get('window').height / 14,
+                  backgroundColor: 'rgba(52, 52, 52, 0)'
+                }}
+                horizontal={true}
+                showsHorizontalScrollIndicator={true}
+              >
+                {this.props.allDrawings.map(drawing => (
+                  <TouchableHighlight
+                    style={localStyles.colorButtons}
+                    key={drawing.id}
+                    onPress={() => {
+                      this.download(drawing.id)
+                      this.setState(prev => {
+                        return { allView: !prev.allView }
+                      })
+                    }}
+                  >
+                    <Text>{drawing.title}</Text>
+                  </TouchableHighlight>
+                ))}
+              </ScrollView>
+            </View>
+          ) : (
+            <View></View>
           )}
         </View>
       </Provider>
@@ -482,7 +600,7 @@ var localStyles = StyleSheet.create({
     marginTop: 5,
     marginBottom: 5,
     backgroundColor: '#68a0cf',
-    borderRadius: 10,
+    borderRadius: 25,
     borderWidth: 1,
     borderColor: '#fff'
   },
