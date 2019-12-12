@@ -1,8 +1,8 @@
 import { AppRegistry } from 'react-native';
-import React from "react";
+import React from 'react';
 import App from './App.js';
-import { Provider } from "react-redux";
-import store from "./store/index";
+import { Provider } from 'react-redux';
+import store from './store/index';
 
 function Root() {
   return (
@@ -11,8 +11,7 @@ function Root() {
     </Provider>
   );
 }
-AppRegistry.registerComponent("ViroSample", () => Root);
+AppRegistry.registerComponent('Spray-R', () => Root);
 
 // The below line is necessary for use with the TestBed App
-AppRegistry.registerComponent("ViroSample", () => Root);
-
+AppRegistry.registerComponent('Spray-R', () => Root);
